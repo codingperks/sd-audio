@@ -5,6 +5,7 @@ model/sd_ex/archive
 ColossalAI
 *.png
 *.jpg
+*.wav
 
 # Weights and Biases
 wandb

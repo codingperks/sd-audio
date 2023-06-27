@@ -1,3 +1,16 @@
-# Training data
+# Data and images
 data/training
 data/experiment*
+model/sd_ex/archive
+ColossalAI
+*.png
+*.jpg
+
+# Weights and Biases
+wandb
+
+# Model checkpoints and weights
+checkpoint-*
+*.bin
+*.ckpt
+

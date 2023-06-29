@@ -28,7 +28,7 @@ class Preprocessor:
         return transformed_data
 
     # Takes an existing dataset and creates a copy with a spectrogram column, allows selection of data prefix
-    def dataset_to_spec(dataset, prefix):
+    def dataset_to_spec(dataset, prefix, n_fft = 256, n_mels = 80):
         prefix_len = len(prefix)
         filtered_data = [d for d in dataset if d["id"][:prefix_len] == prefix]
         

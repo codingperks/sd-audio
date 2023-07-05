@@ -29,9 +29,6 @@ class Processor:
         
         return psuedo_wav
 
-    def play_wav(data, sample_rate):
-        IPython.display.Audio(data.numpy(), rate=sample_rate)
-
     # Takes an existing dataset and creates a copy with a spectrogram columm - no prefix
     def dataset_to_spec(dataset, n_fft = 256, n_mels = 80):    
         transformed_data = []
@@ -63,7 +60,8 @@ class Processor:
             
         return transformed_data
     
-    
+    def play_wav(data, sample_rate):
+        IPython.display.Audio(data.numpy(), rate=sample_rate)
             
     """ 
     Transformation back into

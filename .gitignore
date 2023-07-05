@@ -6,6 +6,9 @@ ColossalAI
 *.png
 *.jpg
 *.wav
+*.tfrecord
+*.zip
+*.tar.*
 
 # Weights and Biases
 wandb

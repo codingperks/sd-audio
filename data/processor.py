@@ -4,26 +4,32 @@ import IPython
 
 class Processor:
     _mel_transform = None
-        
-    def update_transform(data, n_fft, n_mels, sample_rate):
-        Processor._mel_transform = transforms.MelSpectrogram(
+    _n_fft = None
+    _n_mels = None
+    _sample_rate = None
+    
+    def __init__(self, n_fft, n_mels, sample_rate):
+        self._n_fft = n_fft
+        self._n_mels = n_mels
+        self._sample_rate = sample_rate
+        self._mel_transform = transforms.MelSpectrogram(
             sample_rate=sample_rate,
             n_fft=n_fft,
             n_mels=n_mels
-        )
+        ) 
         
     # Returns a spectrogram tensor from a waveform
-    def wav_to_spec(data, n_fft, n_mels, sample_rate):            
-            return Processor.mel_transform(data)
+    def wav_to_spec(self, data):            
+            return self._mel_transform(data)
 
     # Converts spectrogram to wavform 
-    def spec_to_wav(data, n_fft, sample_rate):
-        n_stft = int((n_fft//2) + 1)
+    def spec_to_wav(self, data):
+        n_stft = int((self._n_fft//2) + 1)
         
-        inverse_transform = transforms.InverseMelScale(sample_rate=sample_rate, n_stft=n_stft)
-        grifflim_transform = transforms.GriffinLim(n_fft=n_fft)
+        inverse_transform = transforms.InverseMelScale(sample_rate=self._sample_rate, n_stft=n_stft)
+        grifflim_transform = transforms.GriffinLim(n_fft=self._n_fft)
 
-        mel_specgram = Processor.mel_transform(data)
+        mel_specgram = self._mel_transform(data)
         inverse_wav = inverse_transform(mel_specgram)
         psuedo_wav = grifflim_transform(inverse_wav)
         
@@ -70,4 +76,15 @@ class Processor:
 
     mel_specgram = transform(waveform)
     inverse_waveform = invers_transform(mel_specgram)
-    pseudo_waveform = grifflim_transform(inverse_waveform) """        
+    pseudo_waveform = grifflim_transform(inverse_waveform) 
+    """        
+    
+        
+    """     def update_transform(n_fft, n_mels, sample_rate):
+    Processor._n_fft = n_fft
+    Processor._n_mels = n_mels
+    Processor._mel_transform = transforms.MelSpectrogram(
+        sample_rate=sample_rate,
+        n_fft=n_fft,
+        n_mels=n_mels
+    ) """

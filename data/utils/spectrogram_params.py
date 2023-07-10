@@ -19,29 +19,7 @@ class SpectrogramParams:
 
     # Whether the audio is stereo or mono
     stereo: bool = False
-    
-    # FFT parameters
-    sample_rate = 44100
-    step_size_ms = 10
-    window_duration_ms = 20
-    padded_duration_ms = 400
 
-    # Mel scale parameters
-    num_frequencies = 512
-    min_frequency = 20
-    max_frequency = 20000
-    mel_scale_norm = None
-    mel_scale_type = "htk"
-    max_mel_iters = 200
-
-    # Griffin Lim parameters
-    num_griffin_lim_iters = 64
-
-    # Image parameterization
-    power_for_image = 0.5
-
-
-    """ OG Params
     # FFT parameters
     sample_rate: int = 44100
     step_size_ms: int = 10
@@ -61,7 +39,7 @@ class SpectrogramParams:
     num_griffin_lim_iters: int = 32
 
     # Image parameterization
-    power_for_image: float = 0.25 """
+    power_for_image: float = 0.25
 
     class ExifTags(Enum):
         """
@@ -100,7 +78,7 @@ class SpectrogramParams:
         """
         The number of samples between each STFT window.
         """
-        return int(self.step_size_ms / 1000.0 * self.sample_rate) 
+        return int(self.step_size_ms / 1000.0 * self.sample_rate)
 
     def to_exif(self) -> T.Dict[int, T.Any]:
         """

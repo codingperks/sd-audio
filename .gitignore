@@ -9,6 +9,7 @@ ColossalAI
 *.tfrecord
 *.zip
 *.tar.*
+*.mp3
 
 # Weights and Biases
 wandb

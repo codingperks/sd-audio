@@ -46,6 +46,15 @@ from diffusers.optimization import get_scheduler
 from diffusers.utils import check_min_version, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
 
+import sys
+sys.path.append('../../../data')
+from utils.spectrogram_converter import SpectrogramConverter
+from utils.spectrogram_params import SpectrogramParams
+from utils.spectrogram_image_converter import SpectrogramImageConverter
+from pydub import AudioSegment
+import typing as T
+
+
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.18.0.dev0")
@@ -79,6 +88,31 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
 """
     with open(os.path.join(repo_folder, "README.md"), "w") as f:
         f.write(yaml + model_card)
+
+def image_to_audio(image):
+     # Define named sets of parameters
+    param_sets: T.Dict[str, SpectrogramParams] = {}
+    
+    param_sets["default"] = SpectrogramParams(
+        sample_rate=44100,
+        stereo=True,
+        step_size_ms=20,
+        min_frequency=20,
+        max_frequency=20000,
+        num_frequencies=512,
+    )
+    
+    for name, params in param_sets.items():
+        converter = SpectrogramImageConverter(params=params, device="cuda")
+        segment = converter.audio_from_spectrogram_image(
+            image=image,
+            apply_filters=True
+        )
+    
+    segment = segment.get_array_of_samples()
+    segment = np.array(segment)
+    
+    return segment
 
 
 def parse_args():
@@ -867,8 +901,12 @@ def main():
                     if tracker.name == "wandb":
                         tracker.log(
                             {
-                                "validation": [
+                                "validation_image": [
                                     wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
+                                    for i, image in enumerate(images)
+                                ],
+                                "validation_audio": [
+                                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
                                     for i, image in enumerate(images)
                                 ]
                             }

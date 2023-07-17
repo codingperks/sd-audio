@@ -48,13 +48,9 @@ from diffusers.utils.import_utils import is_xformers_available
 
 import sys
 sys.path.append('../../../data')
-from utils.spectrogram_converter import SpectrogramConverter
 from utils.spectrogram_params import SpectrogramParams
 from utils.spectrogram_image_converter import SpectrogramImageConverter
-from pydub import AudioSegment
 import typing as T
-
-
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.18.0.dev0")
@@ -102,16 +98,19 @@ def image_to_audio(image):
         num_frequencies=512,
     )
     
-    for name, params in param_sets.items():
-        converter = SpectrogramImageConverter(params=params, device="cuda")
-        segment = converter.audio_from_spectrogram_image(
-            image=image,
-            apply_filters=True
-        )
+    converter = SpectrogramImageConverter(params=param_sets["default"], device="cuda")
+    segment = converter.audio_from_spectrogram_image(
+        image=image,
+        apply_filters=True
+    )
     
+    # Convert to mono
+    segment = segment.set_channels(1)
+
     segment = segment.get_array_of_samples()
     segment = np.array(segment)
-    
+
+
     return segment
 
 
@@ -156,6 +155,14 @@ def parse_args():
             " https://huggingface.co/docs/datasets/image_dataset#imagefolder. In particular, a `metadata.jsonl` file"
             " must exist to provide the captions for the images. Ignored if `dataset_name` is specified."
         ),
+    ),
+    parser.add_argument(
+        "--train_data_dir_audio",
+        type=str,
+        default=None,
+        help=(
+            "Folder containing the training audio for the purpose of logging to wandb"
+        )
     )
     parser.add_argument(
         "--image_column", type=str, default="image", help="The column of the dataset containing an image."
@@ -899,6 +906,7 @@ def main():
                         np_images = np.stack([np.asarray(img) for img in images])
                         tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
                     if tracker.name == "wandb":
+                        # Audio conversion
                         tracker.log(
                             {
                                 "validation_image": [

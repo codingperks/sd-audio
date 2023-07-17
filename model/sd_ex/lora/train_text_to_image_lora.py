@@ -51,6 +51,10 @@ sys.path.append('../../../data')
 from utils.spectrogram_params import SpectrogramParams
 from utils.spectrogram_image_converter import SpectrogramImageConverter
 import typing as T
+from torchvision.utils import make_grid
+from PIL import Image
+from torchvision.transforms.functional import to_pil_image
+
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.18.0.dev0")
@@ -157,12 +161,13 @@ def parse_args():
         ),
     ),
     parser.add_argument(
-        "--train_data_dir_audio",
+        "--val_data_dir",
         type=str,
         default=None,
         help=(
-            "Folder containing the training audio for the purpose of logging to wandb"
-        )
+            "A folder containing the validation data. Folder contents must follow the structure described in"
+            " https://huggingface.co/docs/datasets/image_dataset#imagefolder. In particular, a `metadata.jsonl` file"
+            " must exist to provide the captions for the images. Ignored if `dataset_name` is specified."        )
     )
     parser.add_argument(
         "--image_column", type=str, default="image", help="The column of the dataset containing an image."
@@ -418,7 +423,7 @@ def main():
         if not is_wandb_available():
             raise ImportError("Make sure to install wandb if you want to use it for logging during training.")
         import wandb
-
+        
     # Make one log on every process with the configuration for debugging.
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -655,7 +660,7 @@ def main():
             transforms.Normalize([0.5], [0.5]),
         ]
     )
-
+    
     def preprocess_train(examples):
         images = [image.convert("RGB") for image in examples[image_column]]
         examples["pixel_values"] = [train_transforms(image) for image in images]
@@ -765,6 +770,13 @@ def main():
                 if step % args.gradient_accumulation_steps == 0:
                     progress_bar.update(1)
                 continue
+          
+            pixel_values = batch["pixel_values"]
+            image = to_pil_image(pixel_values[0])
+          
+            # Log the batch of training images and audio
+            wandb.log({"train/training_images": [wandb.Image(batch["pixel_values"], caption=f"Step {step}")]})
+            wandb.log({"train/training_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]})
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space
@@ -909,11 +921,11 @@ def main():
                         # Audio conversion
                         tracker.log(
                             {
-                                "validation_image": [
+                                "validation/validation_image": [
                                     wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
                                     for i, image in enumerate(images)
                                 ],
-                                "validation_audio": [
+                                "validation/validation_audio": [
                                     wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
                                     for i, image in enumerate(images)
                                 ]
@@ -971,7 +983,7 @@ def main():
                 if tracker.name == "wandb":
                     tracker.log(
                         {
-                            "test": [
+                            "test/test": [
                                 wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
                                 for i, image in enumerate(images)
                             ]

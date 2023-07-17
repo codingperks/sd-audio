@@ -206,6 +206,15 @@ def parse_args():
         ),
     )
     parser.add_argument(
+        "--max_val_samples",
+        type=int,
+        default=None,
+        help=(
+            "For debugging purposes or quicker training, truncate the number of training examples to this "
+            "value if set."
+        ),
+    )
+    parser.add_argument(
         "--output_dir",
         type=str,
         default="sd-model-finetuned-lora",
@@ -243,6 +252,9 @@ def parse_args():
     )
     parser.add_argument(
         "--train_batch_size", type=int, default=16, help="Batch size (per device) for the training dataloader."
+    )
+    parser.add_argument(
+        "--val_batch_size", type=int, default=16, help="Batch size (per device) for the validation dataloader."
     )
     parser.add_argument("--num_train_epochs", type=int, default=100)
     parser.add_argument(
@@ -600,6 +612,8 @@ def main():
         data_files = {}
         if args.train_data_dir is not None:
             data_files["train"] = os.path.join(args.train_data_dir, "**")
+        if args.val_data_dir is not None:  # make sure to include an argument for your validation data directory
+            data_files["validation"] = os.path.join(args.val_data_dir, "**")
         dataset = load_dataset(
             "imagefolder",
             data_files=data_files,
@@ -666,12 +680,24 @@ def main():
         examples["pixel_values"] = [train_transforms(image) for image in images]
         examples["input_ids"] = tokenize_captions(examples)
         return examples
+    
+    def preprocess_val(examples):
+        images = [image.convert("RGB") for image in examples[image_column]]
+        examples["pixel_values"] = [train_transforms(image) for image in images]
+        examples["input_ids"] = tokenize_captions(examples, is_train=False)
+        return examples
 
     with accelerator.main_process_first():
         if args.max_train_samples is not None:
             dataset["train"] = dataset["train"].shuffle(seed=args.seed).select(range(args.max_train_samples))
         # Set the training transforms
         train_dataset = dataset["train"].with_transform(preprocess_train)
+        
+        if args.max_val_samples is not None:
+            dataset["validation"] = dataset["validation"].select(range(args.max_val_samples))
+        # Set the validation transforms
+        val_dataset = dataset["validation"].with_transform(preprocess_val)
+
 
     def collate_fn(examples):
         pixel_values = torch.stack([example["pixel_values"] for example in examples])
@@ -685,6 +711,14 @@ def main():
         shuffle=True,
         collate_fn=collate_fn,
         batch_size=args.train_batch_size,
+        num_workers=args.dataloader_num_workers,
+    )
+    
+    val_dataloader = torch.utils.data.DataLoader(
+        val_dataset,
+        shuffle=False,
+        collate_fn=collate_fn,
+        batch_size=args.val_batch_size,
         num_workers=args.dataloader_num_workers,
     )
 
@@ -881,13 +915,63 @@ def main():
                         accelerator.save_state(save_path)
                         logger.info(f"Saved state to {save_path}")
 
+            # validation loop
+            unet.eval() # set model to evaluation mode
+            valid_loss = 0.0
+            for step, batch in enumerate(val_dataloader):
+                with torch.no_grad():  # disable gradient calculation
+                    pixel_values = batch["pixel_values"]
+                    image = to_pil_image(pixel_values[0])
+                    
+                    # Log the batch of training images and audio
+                    wandb.log({"val/validation_images": [wandb.Image(batch["pixel_values"], caption=f"Step {step}")]})
+                    wandb.log({"val/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]})
+
+                    latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()
+                    latents = latents * vae.config.scaling_factor
+
+                    noise = torch.randn_like(latents)
+
+                    bsz = latents.shape[0]
+                    timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
+                    timesteps = timesteps.long()
+
+                    noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
+
+                    encoder_hidden_states = text_encoder(batch["input_ids"])[0]
+
+                    if noise_scheduler.config.prediction_type == "epsilon":
+                        target = noise
+                    elif noise_scheduler.config.prediction_type == "v_prediction":
+                        target = noise_scheduler.get_velocity(latents, noise, timesteps)
+                    else:
+                        raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
+
+                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+
+                    if args.snr_gamma is None:
+                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                    else:
+                        snr = compute_snr(timesteps)
+                        mse_loss_weights = (
+                            torch.stack([snr, args.snr_gamma * torch.ones_like(timesteps)], dim=1).min(dim=1)[0] / snr
+                        )
+                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="none")
+                        loss = loss.mean(dim=list(range(1, len(loss.shape)))) * mse_loss_weights
+                        loss = loss.mean()
+
+                    avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
+                    valid_loss += avg_loss.item()
+
+            valid_loss /= len(val_dataloader)  # calculate average validation loss
+            wandb.log({"validation_loss": valid_loss}, step=epoch)  # log validation loss
+
             logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(**logs)
 
             if global_step >= args.max_train_steps:
                 break
 
-        if accelerator.is_main_process:
             if args.validation_prompt is not None and epoch % args.validation_epochs == 0:
                 logger.info(
                     f"Running validation... \n Generating {args.num_validation_images} images with prompt:"

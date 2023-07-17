@@ -737,8 +737,8 @@ def main():
     )
 
     # Prepare everything with our `accelerator`.
-    lora_layers, optimizer, train_dataloader, lr_scheduler = accelerator.prepare(
-        lora_layers, optimizer, train_dataloader, lr_scheduler
+    lora_layers, optimizer, train_dataloader, val_dataloader, lr_scheduler = accelerator.prepare(
+        lora_layers, optimizer, train_dataloader, val_dataloader, lr_scheduler
     )
 
     # We need to recalculate our total training steps as the size of the training dataloader may have changed.
@@ -796,6 +796,7 @@ def main():
     progress_bar.set_description("Steps")
 
     for epoch in range(first_epoch, args.num_train_epochs):
+        logger.info(f"Starting epoch {epoch}")
         unet.train()
         train_loss = 0.0
         for step, batch in enumerate(train_dataloader):
@@ -804,13 +805,14 @@ def main():
                 if step % args.gradient_accumulation_steps == 0:
                     progress_bar.update(1)
                 continue
-          
+            
+            logger.info(f"Starting training step {step}, global step {global_step}")
             pixel_values = batch["pixel_values"]
             image = to_pil_image(pixel_values[0])
           
             # Log the batch of training images and audio
-            wandb.log({"train/training_images": [wandb.Image(batch["pixel_values"], caption=f"Step {step}")]})
-            wandb.log({"train/training_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]})
+            wandb.log({"train/training_images": wandb.Image(batch["pixel_values"])})
+            #wandb.log({"train/training_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]})
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space
@@ -872,6 +874,10 @@ def main():
                 # Gather the losses across all processes for logging (if we use distributed training).
                 avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
                 train_loss += avg_loss.item() / args.gradient_accumulation_steps
+                
+                logger.info(f"train loss is {train_loss}")
+                logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
+                progress_bar.set_postfix(**logs)
 
                 # Backpropagate
                 accelerator.backward(loss)
@@ -914,18 +920,23 @@ def main():
                         save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}")
                         accelerator.save_state(save_path)
                         logger.info(f"Saved state to {save_path}")
+            
+        avg_train_loss = train_loss / len(train_dataloader)
+        wandb.log({"train_loss": avg_train_loss}, step=epoch)
 
-            # validation loop
+        # validation loop
+        if epoch % args.validation_epochs == 0:
             unet.eval() # set model to evaluation mode
             valid_loss = 0.0
             for step, batch in enumerate(val_dataloader):
+                logger.info(f"Starting val step {step}, global step {global_step}")
                 with torch.no_grad():  # disable gradient calculation
                     pixel_values = batch["pixel_values"]
                     image = to_pil_image(pixel_values[0])
                     
                     # Log the batch of training images and audio
                     wandb.log({"val/validation_images": [wandb.Image(batch["pixel_values"], caption=f"Step {step}")]})
-                    wandb.log({"val/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]})
+                    # wandb.log({"val/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]})
 
                     latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()
                     latents = latents * vae.config.scaling_factor
@@ -950,74 +961,76 @@ def main():
                     model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
 
                     if args.snr_gamma is None:
-                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                        val_loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
                     else:
                         snr = compute_snr(timesteps)
                         mse_loss_weights = (
                             torch.stack([snr, args.snr_gamma * torch.ones_like(timesteps)], dim=1).min(dim=1)[0] / snr
                         )
-                        loss = F.mse_loss(model_pred.float(), target.float(), reduction="none")
-                        loss = loss.mean(dim=list(range(1, len(loss.shape)))) * mse_loss_weights
-                        loss = loss.mean()
+                        val_loss = F.mse_loss(model_pred.float(), target.float(), reduction="none")
+                        val_loss = val_loss.mean(dim=list(range(1, len(val_loss.shape)))) * mse_loss_weights
+                        val_loss = val_loss.mean()
 
-                    avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
-                    valid_loss += avg_loss.item()
+                    val_avg_loss = accelerator.gather(val_loss.repeat(args.val_batch_size)).mean()
+                    valid_loss += val_avg_loss.item()
+                    
+                    val_log = {"validation_step_loss": val_avg_loss.item()}
+                    logger.info(f"Val step loss is {valid_loss}")
+                    progress_bar.set_postfix(**val_log)
+                    accelerator.log(val_log, step=global_step)
+            
+        avg_valid_loss = valid_loss / len(val_dataloader)
+        accelerator.log({"avg_val_loss": avg_valid_loss}, step=global_step)
 
-            valid_loss /= len(val_dataloader)  # calculate average validation loss
-            wandb.log({"validation_loss": valid_loss}, step=epoch)  # log validation loss
+        if global_step >= args.max_train_steps:
+            break
 
-            logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
-            progress_bar.set_postfix(**logs)
+        if args.validation_prompt is not None and epoch % args.validation_epochs == 0:
+            logger.info(
+                f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
+                f" {args.validation_prompt}."
+            )
+            # create pipeline
+            pipeline = DiffusionPipeline.from_pretrained(
+                args.pretrained_model_name_or_path,
+                unet=accelerator.unwrap_model(unet),
+                revision=args.revision,
+                torch_dtype=weight_dtype,
+            )
+            pipeline = pipeline.to(accelerator.device)
+            pipeline.set_progress_bar_config(disable=True)
 
-            if global_step >= args.max_train_steps:
-                break
-
-            if args.validation_prompt is not None and epoch % args.validation_epochs == 0:
-                logger.info(
-                    f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
-                    f" {args.validation_prompt}."
+            # run inference
+            generator = torch.Generator(device=accelerator.device)
+            if args.seed is not None:
+                generator = generator.manual_seed(args.seed)
+            images = []
+            for _ in range(args.num_validation_images):
+                images.append(
+                    pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0]
                 )
-                # create pipeline
-                pipeline = DiffusionPipeline.from_pretrained(
-                    args.pretrained_model_name_or_path,
-                    unet=accelerator.unwrap_model(unet),
-                    revision=args.revision,
-                    torch_dtype=weight_dtype,
-                )
-                pipeline = pipeline.to(accelerator.device)
-                pipeline.set_progress_bar_config(disable=True)
 
-                # run inference
-                generator = torch.Generator(device=accelerator.device)
-                if args.seed is not None:
-                    generator = generator.manual_seed(args.seed)
-                images = []
-                for _ in range(args.num_validation_images):
-                    images.append(
-                        pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0]
+            for tracker in accelerator.trackers:
+                if tracker.name == "tensorboard":
+                    np_images = np.stack([np.asarray(img) for img in images])
+                    tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
+                if tracker.name == "wandb":
+                    # Audio conversion
+                    tracker.log(
+                        {
+                            "val_inf/validation_inference_image": [
+                                wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
+                                for i, image in enumerate(images)
+                            ],
+                            "val_inf/validation_inference_audio": [
+                                wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
+                                for i, image in enumerate(images)
+                            ]
+                        }
                     )
 
-                for tracker in accelerator.trackers:
-                    if tracker.name == "tensorboard":
-                        np_images = np.stack([np.asarray(img) for img in images])
-                        tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
-                    if tracker.name == "wandb":
-                        # Audio conversion
-                        tracker.log(
-                            {
-                                "validation/validation_image": [
-                                    wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
-                                    for i, image in enumerate(images)
-                                ],
-                                "validation/validation_audio": [
-                                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
-                                    for i, image in enumerate(images)
-                                ]
-                            }
-                        )
-
-                del pipeline
-                torch.cuda.empty_cache()
+            del pipeline
+            torch.cuda.empty_cache()
 
     # Save the lora layers
     accelerator.wait_for_everyone()

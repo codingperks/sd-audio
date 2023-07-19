@@ -678,12 +678,22 @@ def main():
         images = [image.convert("RGB") for image in examples[image_column]]
         examples["pixel_values"] = [train_transforms(image) for image in images]
         examples["input_ids"] = tokenize_captions(examples)
+        
+        # load audio data
+        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[image_column]]
+        examples["audio"] = [torchaudio.load(wav_path)[0] for wav_path in audio_files]
+
         return examples
     
     def preprocess_val(examples):
         images = [image.convert("RGB") for image in examples[image_column]]
         examples["pixel_values"] = [train_transforms(image) for image in images]
         examples["input_ids"] = tokenize_captions(examples, is_train=False)
+        
+        # load audio data
+        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[image_column]]
+        examples["audio"] = [torchaudio.load(wav_path)[0] for wav_path in audio_files]
+        
         return examples
 
     with accelerator.main_process_first():
@@ -811,11 +821,12 @@ def main():
             #logger.info(f"Starting training step {step}, global step {global_step}")
             pixel_values = batch["pixel_values"]
             image = to_pil_image(pixel_values[0])
+            audio_data = batch["audio"]
           
-            # Log the batch of training images and audio every 1000 epochs
+            # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 wandb.log({"train_input/training_images": [wandb.Image(pixel_values, caption=f"Epoch {epoch}")]}, commit=False)
-                #wandb.log({"train_input/training_audio": [wandb.Audio(batc)]})
+                wandb.log({"train_input/training_audio": [wandb.Audio(audio_data, sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
                 wandb.log({"train_input/training_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
            
             with accelerator.accumulate(unet):

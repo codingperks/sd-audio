@@ -27,6 +27,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
+import torchaudio
 import transformers
 from accelerate import Accelerator
 from accelerate.logging import get_logger
@@ -643,6 +644,13 @@ def main():
             raise ValueError(
                 f"--caption_column' value '{args.caption_column}' needs to be one of: {', '.join(column_names)}"
             )
+            
+    # Handling the audiofile column
+    audiofile_column = 'audiofile'  # adjust this to the actual name in your dataset
+    if audiofile_column not in column_names:
+        raise ValueError(
+            f"'audiofile_column' value '{audiofile_column}' needs to be one of: {', '.join(column_names)}"
+        )
 
     # Preprocessing the datasets.
     # We need to tokenize input captions and transform the images.
@@ -680,7 +688,7 @@ def main():
         examples["input_ids"] = tokenize_captions(examples)
         
         # load audio data
-        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[image_column]]
+        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[audiofile_column]]
         examples["audio"] = [torchaudio.load(wav_path)[0] for wav_path in audio_files]
 
         return examples
@@ -691,7 +699,7 @@ def main():
         examples["input_ids"] = tokenize_captions(examples, is_train=False)
         
         # load audio data
-        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[image_column]]
+        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[audiofile_column]]
         examples["audio"] = [torchaudio.load(wav_path)[0] for wav_path in audio_files]
         
         return examples
@@ -712,8 +720,13 @@ def main():
         pixel_values = torch.stack([example["pixel_values"] for example in examples])
         pixel_values = pixel_values.to(memory_format=torch.contiguous_format).float()
         input_ids = torch.stack([example["input_ids"] for example in examples])
-        return {"pixel_values": pixel_values, "input_ids": input_ids}
+        
+        # Adding audio into batch
+        audio = torch.stack([example["audio"] for example in examples])
 
+        return {"pixel_values": pixel_values, "input_ids": input_ids, "audio": audio}
+
+    
     # DataLoaders creation:
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,
@@ -822,11 +835,13 @@ def main():
             pixel_values = batch["pixel_values"]
             image = to_pil_image(pixel_values[0])
             audio_data = batch["audio"]
-          
+            audio_data = audio_data.squeeze() 
+            audio_data = audio_data.reshape(-1, 1)
+
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 wandb.log({"train_input/training_images": [wandb.Image(pixel_values, caption=f"Epoch {epoch}")]}, commit=False)
-                wandb.log({"train_input/training_audio": [wandb.Audio(audio_data, sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
+                wandb.log({"train_input/training_audio": [wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
                 wandb.log({"train_input/training_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
            
             with accelerator.accumulate(unet):
@@ -953,11 +968,18 @@ def main():
             for step, batch in enumerate(val_dataloader):
                 val_step += 1
                 #logger.info(f"Starting val step {step}, global step {global_step}")
+                pixel_values = batch["pixel_values"]
+                image = to_pil_image(pixel_values[0])
+                audio_data = batch["audio"]
+                audio_data = audio_data.squeeze() 
+                audio_data = audio_data.reshape(-1, 1)
+                
+                wandb.log({"val_input/validation_images": [wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch}")]}, commit=False)
+                wandb.log({"val_input/validation_audio": [wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
+                wandb.log({"val_input/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
+
                 with torch.no_grad():  # disable gradient calculation
-                    pixel_values = batch["pixel_values"]
-                    image = to_pil_image(pixel_values[0])
-                    
-                    wandb.log({"val_input/validation_images": [wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch}")]}, commit=False)
+
                     #wandb.log({"val_input/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]}, commit=False)
 
                     latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()

@@ -106,7 +106,7 @@ def image_to_audio(image):
     converter = SpectrogramImageConverter(params=param_sets["default"], device="cuda")
     segment = converter.audio_from_spectrogram_image(
         image=image,
-        apply_filters=True
+        apply_filters=False
     )
     
     # Convert to mono
@@ -825,6 +825,10 @@ def main():
        # TRAINING LOOP
         unet.train()
         train_loss = 0.0
+        train_images_log = []
+        train_audio_log = []
+        train_images_audio_log = []
+
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
             if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
@@ -837,14 +841,17 @@ def main():
             image = to_pil_image(pixel_values[0])
             audio_data = batch["audio"]
             audio_data = audio_data.squeeze() 
-            audio_data = audio_data.reshape(-1, 1)
-
+            if audio_data.dim() > 1 and audio_data.shape[0] > 1:
+                audio_data = audio_data.mean(dim=0)
+            else:
+                audio_data = audio_data
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
-                wandb.log({"train_input/training_images": [wandb.Image(pixel_values, caption=f"Epoch {epoch}")]}, commit=False)
-                wandb.log({"train_input/training_audio": [wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
-                wandb.log({"train_input/training_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
-           
+                # Collect data to log after loop
+                train_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
+                train_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+                train_images_audio_log.append(wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+
             with accelerator.accumulate(unet):
                 # Convert images to latent space
                 latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()
@@ -956,6 +963,12 @@ def main():
             logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(**logs)
             
+        # Log the batch of training images and audio every 10 epochs
+        if epoch == 0 or epoch % 10 == 0:
+            wandb.log({"train_input/training_images": train_images_log}, commit=False)
+            wandb.log({"train_input/training_audio": train_audio_log}, commit=False)
+            wandb.log({"train_input/training_images_audio (LOSSY)": train_images_audio_log}, commit=False)
+
         avg_train_loss_per_epoch = train_loss / len(train_dataloader)
         accelerator.log({"avg_train_loss_per_epoch": avg_train_loss_per_epoch}, step=global_step)
         
@@ -966,6 +979,10 @@ def main():
         if epoch % args.validation_epochs == 0:
             unet.eval() # set model to evaluation mode
             valid_loss = 0.0
+            val_images_log = []
+            val_audio_log = []
+            val_images_audio_log = []
+
             for step, batch in enumerate(val_dataloader):
                 val_step += 1
                 #logger.info(f"Starting val step {step}, global step {global_step}")
@@ -979,10 +996,11 @@ def main():
                     audio_data = audio_data.mean(dim=0)
                 else:
                     audio_data = audio_data
-                
-                wandb.log({"val_input/validation_images": [wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch}")]}, commit=False)
-                wandb.log({"val_input/validation_audio": [wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
-                wandb.log({"val_input/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
+                    
+                # Collect data to log after loop
+                val_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
+                val_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+                val_images_audio_log.append(wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
 
                 with torch.no_grad():  # disable gradient calculation
 
@@ -1029,11 +1047,15 @@ def main():
                     logger.info(f"Cumulative validation average loss is {valid_loss}")
 
                     #accelerator.log({"val_step_loss": avg_val_loss_per_step}, step=global_step) # log the per-step average validation loss
+                    
+            wandb.log({"val_input/validation_images": val_images_log}, commit=False)
+            wandb.log({"val_input/validation_audio": val_audio_log}, commit=False)
+            wandb.log({"val_input/validation_images_audio (LOSSY)": val_images_audio_log}, commit=False)
                             
             avg_valid_loss_per_epoch = valid_loss / len(val_dataloader) # calculate average validation loss per epoch
             logger.info(f"Average validation loss for Epoch {epoch} is {avg_valid_loss_per_epoch}")
             accelerator.log({"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch}, step=global_step) # log the average validation loss per epoch
-
+            
         if global_step >= args.max_train_steps:
             break
         if accelerator.is_main_process:

@@ -27,6 +27,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
+import torchaudio
 import transformers
 from accelerate import Accelerator
 from accelerate.logging import get_logger
@@ -51,6 +52,10 @@ sys.path.append('../../../data')
 from utils.spectrogram_params import SpectrogramParams
 from utils.spectrogram_image_converter import SpectrogramImageConverter
 import typing as T
+from torchvision.utils import make_grid
+from PIL import Image
+from torchvision.transforms.functional import to_pil_image
+
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.18.0.dev0")
@@ -91,7 +96,7 @@ def image_to_audio(image):
     
     param_sets["default"] = SpectrogramParams(
         sample_rate=44100,
-        stereo=True,
+        stereo=False,
         step_size_ms=20,
         min_frequency=20,
         max_frequency=20000,
@@ -105,11 +110,10 @@ def image_to_audio(image):
     )
     
     # Convert to mono
-    segment = segment.set_channels(1)
+    # segment = segment.set_channels(1)
 
     segment = segment.get_array_of_samples()
     segment = np.array(segment)
-
 
     return segment
 
@@ -157,12 +161,13 @@ def parse_args():
         ),
     ),
     parser.add_argument(
-        "--train_data_dir_audio",
+        "--val_data_dir",
         type=str,
         default=None,
         help=(
-            "Folder containing the training audio for the purpose of logging to wandb"
-        )
+            "A folder containing the validation data. Folder contents must follow the structure described in"
+            " https://huggingface.co/docs/datasets/image_dataset#imagefolder. In particular, a `metadata.jsonl` file"
+            " must exist to provide the captions for the images. Ignored if `dataset_name` is specified."        )
     )
     parser.add_argument(
         "--image_column", type=str, default="image", help="The column of the dataset containing an image."
@@ -193,6 +198,15 @@ def parse_args():
     )
     parser.add_argument(
         "--max_train_samples",
+        type=int,
+        default=None,
+        help=(
+            "For debugging purposes or quicker training, truncate the number of training examples to this "
+            "value if set."
+        ),
+    )
+    parser.add_argument(
+        "--max_val_samples",
         type=int,
         default=None,
         help=(
@@ -238,6 +252,9 @@ def parse_args():
     )
     parser.add_argument(
         "--train_batch_size", type=int, default=16, help="Batch size (per device) for the training dataloader."
+    )
+    parser.add_argument(
+        "--val_batch_size", type=int, default=16, help="Batch size (per device) for the validation dataloader."
     )
     parser.add_argument("--num_train_epochs", type=int, default=100)
     parser.add_argument(
@@ -418,7 +435,7 @@ def main():
         if not is_wandb_available():
             raise ImportError("Make sure to install wandb if you want to use it for logging during training.")
         import wandb
-
+        
     # Make one log on every process with the configuration for debugging.
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -595,6 +612,8 @@ def main():
         data_files = {}
         if args.train_data_dir is not None:
             data_files["train"] = os.path.join(args.train_data_dir, "**")
+        if args.val_data_dir is not None:  # make sure to include an argument for your validation data directory
+            data_files["validation"] = os.path.join(args.val_data_dir, "**")
         dataset = load_dataset(
             "imagefolder",
             data_files=data_files,
@@ -625,6 +644,13 @@ def main():
             raise ValueError(
                 f"--caption_column' value '{args.caption_column}' needs to be one of: {', '.join(column_names)}"
             )
+            
+    # Handling the audiofile column
+    audiofile_column = 'audiofile'  # adjust this to the actual name in your dataset
+    if audiofile_column not in column_names:
+        raise ValueError(
+            f"'audiofile_column' value '{audiofile_column}' needs to be one of: {', '.join(column_names)}"
+        )
 
     # Preprocessing the datasets.
     # We need to tokenize input captions and transform the images.
@@ -655,11 +681,27 @@ def main():
             transforms.Normalize([0.5], [0.5]),
         ]
     )
-
+    
     def preprocess_train(examples):
         images = [image.convert("RGB") for image in examples[image_column]]
         examples["pixel_values"] = [train_transforms(image) for image in images]
         examples["input_ids"] = tokenize_captions(examples)
+        
+        # load audio data
+        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[audiofile_column]]
+        examples["audio"] = [torchaudio.load(wav_path)[0] for wav_path in audio_files]
+
+        return examples
+    
+    def preprocess_val(examples):
+        images = [image.convert("RGB") for image in examples[image_column]]
+        examples["pixel_values"] = [train_transforms(image) for image in images]
+        examples["input_ids"] = tokenize_captions(examples, is_train=False)
+        
+        # load audio data
+        audio_files = [os.path.splitext(image_path)[0] + '.wav' for image_path in examples[audiofile_column]]
+        examples["audio"] = [torchaudio.load(wav_path)[0] for wav_path in audio_files]
+        
         return examples
 
     with accelerator.main_process_first():
@@ -667,19 +709,38 @@ def main():
             dataset["train"] = dataset["train"].shuffle(seed=args.seed).select(range(args.max_train_samples))
         # Set the training transforms
         train_dataset = dataset["train"].with_transform(preprocess_train)
+        
+        if args.max_val_samples is not None:
+            dataset["validation"] = dataset["validation"].select(range(args.max_val_samples))
+        # Set the validation transforms
+        val_dataset = dataset["validation"].with_transform(preprocess_val)
+
 
     def collate_fn(examples):
         pixel_values = torch.stack([example["pixel_values"] for example in examples])
         pixel_values = pixel_values.to(memory_format=torch.contiguous_format).float()
         input_ids = torch.stack([example["input_ids"] for example in examples])
-        return {"pixel_values": pixel_values, "input_ids": input_ids}
+        
+        # Adding audio into batch
+        audio = torch.stack([example["audio"] for example in examples])
 
+        return {"pixel_values": pixel_values, "input_ids": input_ids, "audio": audio}
+
+    
     # DataLoaders creation:
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,
         shuffle=True,
         collate_fn=collate_fn,
         batch_size=args.train_batch_size,
+        num_workers=args.dataloader_num_workers,
+    )
+    
+    val_dataloader = torch.utils.data.DataLoader(
+        val_dataset,
+        shuffle=False,
+        collate_fn=collate_fn,
+        batch_size=args.val_batch_size,
         num_workers=args.dataloader_num_workers,
     )
 
@@ -698,8 +759,8 @@ def main():
     )
 
     # Prepare everything with our `accelerator`.
-    lora_layers, optimizer, train_dataloader, lr_scheduler = accelerator.prepare(
-        lora_layers, optimizer, train_dataloader, lr_scheduler
+    lora_layers, optimizer, train_dataloader, val_dataloader, lr_scheduler = accelerator.prepare(
+        lora_layers, optimizer, train_dataloader, val_dataloader, lr_scheduler
     )
 
     # We need to recalculate our total training steps as the size of the training dataloader may have changed.
@@ -726,6 +787,8 @@ def main():
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     global_step = 0
     first_epoch = 0
+    epoch_ = -1 # for logging
+    val_step = 0
 
     # Potentially load in the weights and states from a previous save
     if args.resume_from_checkpoint:
@@ -757,6 +820,8 @@ def main():
     progress_bar.set_description("Steps")
 
     for epoch in range(first_epoch, args.num_train_epochs):
+        logger.info(f"Starting epoch {epoch}")
+        # epoch_ += 1
         unet.train()
         train_loss = 0.0
         for step, batch in enumerate(train_dataloader):
@@ -765,7 +830,20 @@ def main():
                 if step % args.gradient_accumulation_steps == 0:
                     progress_bar.update(1)
                 continue
+            
+            #logger.info(f"Starting training step {step}, global step {global_step}")
+            pixel_values = batch["pixel_values"]
+            image = to_pil_image(pixel_values[0])
+            audio_data = batch["audio"]
+            audio_data = audio_data.squeeze() 
+            audio_data = audio_data.reshape(-1, 1)
 
+            # Log the batch of training images and audio every 10 epochs
+            if epoch == 0 or epoch % 10 == 0:
+                wandb.log({"train_input/training_images": [wandb.Image(pixel_values, caption=f"Epoch {epoch}")]}, commit=False)
+                wandb.log({"train_input/training_audio": [wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
+                wandb.log({"train_input/training_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
+           
             with accelerator.accumulate(unet):
                 # Convert images to latent space
                 latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()
@@ -825,7 +903,12 @@ def main():
 
                 # Gather the losses across all processes for logging (if we use distributed training).
                 avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
-                train_loss += avg_loss.item() / args.gradient_accumulation_steps
+                avg_loss_per_step = avg_loss.item()
+                train_loss += avg_loss.item()
+                
+                accelerator.log({"training_step_loss": avg_loss_per_step}, step=global_step)
+                
+                logger.info(f"train loss is {train_loss}")
 
                 # Backpropagate
                 accelerator.backward(loss)
@@ -837,11 +920,11 @@ def main():
                 optimizer.zero_grad()
 
             # Checks if the accelerator has performed an optimization step behind the scenes
-            if accelerator.sync_gradients:
+            #if accelerator.sync_gradients:
                 progress_bar.update(1)
                 global_step += 1
-                accelerator.log({"train_loss": train_loss}, step=global_step)
-                train_loss = 0.0
+                #accelerator.log({"train_loss": train_loss}, step=global_step)
+                #train_loss = 0.0
 
                 if global_step % args.checkpointing_steps == 0:
                     if accelerator.is_main_process:
@@ -868,13 +951,85 @@ def main():
                         save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}")
                         accelerator.save_state(save_path)
                         logger.info(f"Saved state to {save_path}")
-
+            
             logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(**logs)
+            
+        avg_train_loss_per_epoch = train_loss / len(train_dataloader)
+        accelerator.log({"avg_train_loss_per_epoch": avg_train_loss_per_epoch}, step=global_step)
+        
+        # reset training loss for next epoch
+        train_loss = 0.0
 
-            if global_step >= args.max_train_steps:
-                break
+        # validation loop
+        if epoch % args.validation_epochs == 0:
+            unet.eval() # set model to evaluation mode
+            valid_loss = 0.0
+            for step, batch in enumerate(val_dataloader):
+                val_step += 1
+                #logger.info(f"Starting val step {step}, global step {global_step}")
+                pixel_values = batch["pixel_values"]
+                image = to_pil_image(pixel_values[0])
+                audio_data = batch["audio"]
+                audio_data = audio_data.squeeze() 
+                audio_data = audio_data.reshape(-1, 1)
+                
+                wandb.log({"val_input/validation_images": [wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch}")]}, commit=False)
+                wandb.log({"val_input/validation_audio": [wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
+                wandb.log({"val_input/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
 
+                with torch.no_grad():  # disable gradient calculation
+
+                    #wandb.log({"val_input/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]}, commit=False)
+
+                    latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample()
+                    latents = latents * vae.config.scaling_factor
+
+                    noise = torch.randn_like(latents)
+
+                    bsz = latents.shape[0]
+                    timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
+                    timesteps = timesteps.long()
+
+                    noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
+
+                    encoder_hidden_states = text_encoder(batch["input_ids"])[0]
+
+                    if noise_scheduler.config.prediction_type == "epsilon":
+                        target = noise
+                    elif noise_scheduler.config.prediction_type == "v_prediction":
+                        target = noise_scheduler.get_velocity(latents, noise, timesteps)
+                    else:
+                        raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
+
+                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+
+                    if args.snr_gamma is None:
+                        val_loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                    else:
+                        snr = compute_snr(timesteps)
+                        mse_loss_weights = (
+                            torch.stack([snr, args.snr_gamma * torch.ones_like(timesteps)], dim=1).min(dim=1)[0] / snr
+                        )
+                        val_loss = F.mse_loss(model_pred.float(), target.float(), reduction="none")
+                        val_loss = val_loss.mean(dim=list(range(1, len(val_loss.shape)))) * mse_loss_weights
+                        val_loss = val_loss.mean()
+
+                    val_avg_loss = accelerator.gather(val_loss.repeat(args.val_batch_size)).mean()
+                    avg_val_loss_per_step = val_avg_loss.item() # calculate average loss per step
+                    valid_loss += val_avg_loss.item() # accumulate average loss over all steps
+
+                    logger.info(f"Per validation step average loss is {avg_val_loss_per_step}")
+                    logger.info(f"Cumulative validation average loss is {valid_loss}")
+
+                    #accelerator.log({"val_step_loss": avg_val_loss_per_step}, step=global_step) # log the per-step average validation loss
+                            
+            avg_valid_loss_per_epoch = valid_loss / len(val_dataloader) # calculate average validation loss per epoch
+            logger.info(f"Average validation loss for Epoch {epoch} is {avg_valid_loss_per_epoch}")
+            accelerator.log({"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch}, step=global_step) # log the average validation loss per epoch
+
+        if global_step >= args.max_train_steps:
+            break
         if accelerator.is_main_process:
             if args.validation_prompt is not None and epoch % args.validation_epochs == 0:
                 logger.info(
@@ -900,25 +1055,38 @@ def main():
                     images.append(
                         pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0]
                     )
-
-                for tracker in accelerator.trackers:
-                    if tracker.name == "tensorboard":
-                        np_images = np.stack([np.asarray(img) for img in images])
-                        tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
-                    if tracker.name == "wandb":
-                        # Audio conversion
-                        tracker.log(
+                    
+                wandb.log(
                             {
-                                "validation_image": [
+                                "val_inf/validation_inference_image": [
                                     wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
                                     for i, image in enumerate(images)
                                 ],
-                                "validation_audio": [
+                                "val_inf/validation_inference_audio": [
                                     wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
                                     for i, image in enumerate(images)
                                 ]
-                            }
+                            },
+                            commit = False
                         )
+
+                """                 for tracker in accelerator.trackers:
+                                    if tracker.name == "tensorboard":
+                                        np_images = np.stack([np.asarray(img) for img in images])
+                                        tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
+                                    if tracker.name == "wandb":
+                                        tracker.log(
+                                            {
+                                                "val_inf/validation_inference_image": [
+                                                    wandb.Image(image, caption=f"{i}: {args.validation_prompt}", commit=False)
+                                                    for i, image in enumerate(images)
+                                                ],
+                                                "val_inf/validation_inference_audio": [
+                                                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}", commit=False)
+                                                    for i, image in enumerate(images)
+                                                ]
+                                            }
+                                        ) """
 
                 del pipeline
                 torch.cuda.empty_cache()
@@ -963,20 +1131,28 @@ def main():
         images.append(pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0])
 
     if accelerator.is_main_process:
-        for tracker in accelerator.trackers:
-            if len(images) != 0:
-                if tracker.name == "tensorboard":
-                    np_images = np.stack([np.asarray(img) for img in images])
-                    tracker.writer.add_images("test", np_images, epoch, dataformats="NHWC")
-                if tracker.name == "wandb":
-                    tracker.log(
-                        {
-                            "test": [
-                                wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
-                                for i, image in enumerate(images)
-                            ]
-                        }
-                    )
+        wandb.log(
+            {
+                "test/test": [
+                    wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
+                    for i, image in enumerate(images)
+                ]
+            }
+        )
+        """         for tracker in accelerator.trackers:
+                    if len(images) != 0:
+                        if tracker.name == "tensorboard":
+                            np_images = np.stack([np.asarray(img) for img in images])
+                            tracker.writer.add_images("test", np_images, epoch, dataformats="NHWC")
+                        if tracker.name == "wandb":
+                            tracker.log(
+                                {
+                                    "test/test": [
+                                        wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
+                                        for i, image in enumerate(images)
+                                    ]
+                                }
+                            ) """
 
     accelerator.end_training()
 

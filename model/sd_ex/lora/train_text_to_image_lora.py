@@ -821,7 +821,8 @@ def main():
 
     for epoch in range(first_epoch, args.num_train_epochs):
         logger.info(f"Starting epoch {epoch}")
-        # epoch_ += 1
+       
+       # TRAINING LOOP
         unet.train()
         train_loss = 0.0
         for step, batch in enumerate(train_dataloader):
@@ -961,7 +962,7 @@ def main():
         # reset training loss for next epoch
         train_loss = 0.0
 
-        # validation loop
+        # VALIDATION LOOP
         if epoch % args.validation_epochs == 0:
             unet.eval() # set model to evaluation mode
             valid_loss = 0.0
@@ -970,9 +971,14 @@ def main():
                 #logger.info(f"Starting val step {step}, global step {global_step}")
                 pixel_values = batch["pixel_values"]
                 image = to_pil_image(pixel_values[0])
+                
+                # Ensuring audio data has correct dimensions for logging
                 audio_data = batch["audio"]
                 audio_data = audio_data.squeeze() 
-                audio_data = audio_data.reshape(-1, 1)
+                if audio_data.dim() > 1 and audio_data.shape[0] > 1:
+                    audio_data = audio_data.mean(dim=0)
+                else:
+                    audio_data = audio_data
                 
                 wandb.log({"val_input/validation_images": [wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch}")]}, commit=False)
                 wandb.log({"val_input/validation_audio": [wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch}")]}, commit=False)
@@ -1133,8 +1139,12 @@ def main():
     if accelerator.is_main_process:
         wandb.log(
             {
-                "test/test": [
+                "test/test_image": [
                     wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
+                    for i, image in enumerate(images)
+                ],                                
+                "test/test_audio": [
+                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
                     for i, image in enumerate(images)
                 ]
             }

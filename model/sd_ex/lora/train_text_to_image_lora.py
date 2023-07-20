@@ -845,12 +845,13 @@ def main():
                 audio_data = audio_data.mean(dim=0)
             else:
                 audio_data = audio_data
+                
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 # Collect data to log after loop
-                train_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
-                train_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
-                train_images_audio_log.append(wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+                wandb.log({"train_input/training_images": wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}")}, commit=False)
+                wandb.log({"train_input/training_audio": wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
+                wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space
@@ -963,12 +964,6 @@ def main():
             logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(**logs)
             
-        # Log the batch of training images and audio every 10 epochs
-        if epoch == 0 or epoch % 10 == 0:
-            wandb.log({"train_input/training_images": train_images_log}, commit=False)
-            wandb.log({"train_input/training_audio": train_audio_log}, commit=False)
-            wandb.log({"train_input/training_images_audio (LOSSY)": train_images_audio_log}, commit=False)
-
         avg_train_loss_per_epoch = train_loss / len(train_dataloader)
         accelerator.log({"avg_train_loss_per_epoch": avg_train_loss_per_epoch}, step=global_step)
         
@@ -984,7 +979,8 @@ def main():
             val_images_audio_log = []
 
             for step, batch in enumerate(val_dataloader):
-                val_step += 1
+                val_step += 1        
+
                 #logger.info(f"Starting val step {step}, global step {global_step}")
                 pixel_values = batch["pixel_values"]
                 image = to_pil_image(pixel_values[0])
@@ -997,7 +993,7 @@ def main():
                 else:
                     audio_data = audio_data
                     
-                # Collect data to log after loop
+                # Log random validation data
                 val_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
                 val_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
                 val_images_audio_log.append(wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
@@ -1048,10 +1044,18 @@ def main():
 
                     #accelerator.log({"val_step_loss": avg_val_loss_per_step}, step=global_step) # log the per-step average validation loss
                     
-            wandb.log({"val_input/validation_images": val_images_log}, commit=False)
-            wandb.log({"val_input/validation_audio": val_audio_log}, commit=False)
-            wandb.log({"val_input/validation_images_audio (LOSSY)": val_images_audio_log}, commit=False)
-                            
+            # At the end of each epoch, randomly select one sample to log
+            random_index = torch.randint(high=len(val_images_log), size=(1,)).item()
+
+            # Extract the selected image and audio
+            selected_image = val_images_log[random_index]
+            selected_audio = val_audio_log[random_index]
+            selected_image_audio = val_images_audio_log[random_index]
+        
+            wandb.log({"val_input/validation_images": selected_image}, commit=False)
+            wandb.log({"val_input/validation_audio": selected_audio}, commit=False)
+            wandb.log({"val_input/validation_images_audio (LOSSY)": selected_image_audio}, commit=False)
+
             avg_valid_loss_per_epoch = valid_loss / len(val_dataloader) # calculate average validation loss per epoch
             logger.info(f"Average validation loss for Epoch {epoch} is {avg_valid_loss_per_epoch}")
             accelerator.log({"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch}, step=global_step) # log the average validation loss per epoch

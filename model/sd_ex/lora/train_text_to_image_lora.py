@@ -182,6 +182,18 @@ def parse_args():
         "--validation_prompt", type=str, default=None, help="A prompt that is sampled during training for inference."
     )
     parser.add_argument(
+        "--validation_prompt2", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
+        "--validation_prompt3", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
+        "--validation_prompt4", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
+        "--validation_prompt5", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
         "--num_validation_images",
         type=int,
         default=4,
@@ -1082,25 +1094,23 @@ def main():
                 generator = torch.Generator(device=accelerator.device)
                 if args.seed is not None:
                     generator = generator.manual_seed(args.seed)
-                images = []
-                for _ in range(args.num_validation_images):
-                    images.append(
-                        pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0]
-                    )
-                    
-                wandb.log(
-                            {
-                                "val_inf/validation_inference_image": [
-                                    wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
-                                    for i, image in enumerate(images)
-                                ],
-                                "val_inf/validation_inference_audio": [
-                                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
-                                    for i, image in enumerate(images)
-                                ]
-                            },
-                            commit = False
+                
+                validation_prompts = [args.validation_prompt, args.validation_prompt2, args.validation_prompt3, args.validation_prompt4, args.validation_prompt5]
+                
+                for idx, prompt in enumerate(validation_prompts):
+                    images = []
+                    for _ in range(args.num_validation_images):
+                        images.append(
+                            pipeline(prompt, num_inference_steps=30, generator=generator).images[0]
                         )
+
+                    wandb.log(
+                        {
+                            f"val_inf/validation_inference_image": [wandb.Image(image, caption=f"{i}: {prompt}") for i, image in enumerate(images)],
+                            f"val_inf/validation_inference_audio": [wandb.Audio(image_to_audio(image), sample_rate=44100, caption=f"{i}: {prompt}") for i, image in enumerate(images)]
+                        },
+                        commit=False
+                    )
 
                 """                 for tracker in accelerator.trackers:
                                     if tracker.name == "tensorboard":

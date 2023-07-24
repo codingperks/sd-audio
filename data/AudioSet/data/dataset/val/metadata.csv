@@ -1,31 +1,161 @@
 file_name,text,audiofile
-Snare drum_iBh37YAaHMU.wav,A spectrogram of snare drum_ibh37yaahmu,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_iBh37YAaHMU.wav
-Cheering_LOLTshIl61E.wav,A spectrogram of cheering_loltshil61e,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_LOLTshIl61E.wav
-Acoustic guitar_1JwoLPCIGhs.wav,A spectrogram of acoustic guitar_1jwolpcighs,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_1JwoLPCIGhs.wav
-Snare drum_W_979HkE4EI.wav,A spectrogram of snare drum_w_979hke4ei,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_W_979HkE4EI.wav
-Snare drum_-R0267o4lLk.wav,A spectrogram of snare drum_-r0267o4llk,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_-R0267o4lLk.wav
-Train horn_j2Kb0mdm7nE.wav,A spectrogram of train horn_j2kb0mdm7ne,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_j2Kb0mdm7nE.wav
-Acoustic guitar_LJsYl38zPOQ.wav,A spectrogram of acoustic guitar_ljsyl38zpoq,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_LJsYl38zPOQ.wav
-Train horn_JBOMYsE8s3k.wav,A spectrogram of train horn_jbomyse8s3k,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_JBOMYsE8s3k.wav
-Dog bark_yBukUnXhYnc.wav,A spectrogram of dog bark_ybukunxhync,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_yBukUnXhYnc.wav
-Cheering_F3lXZDUz4kA.wav,A spectrogram of cheering_f3lxzduz4ka,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_F3lXZDUz4kA.wav
-Snare drum_jaJdPUAv6N0.wav,A spectrogram of snare drum_jajdpuav6n0,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_jaJdPUAv6N0.wav
-Train horn_E33luTTDMPg.wav,A spectrogram of train horn_e33luttdmpg,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_E33luTTDMPg.wav
-Train horn_MNkQGlmeyK0.wav,A spectrogram of train horn_mnkqglmeyk0,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_MNkQGlmeyK0.wav
-Cheering_7mGVgQhMQCE.wav,A spectrogram of cheering_7mgvgqhmqce,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_7mGVgQhMQCE.wav
-Train horn_l5IEFoQ_BTQ.wav,A spectrogram of train horn_l5iefoq_btq,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_l5IEFoQ_BTQ.wav
-Snare drum_FvdUm5j_oA0.wav,A spectrogram of snare drum_fvdum5j_oa0,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_FvdUm5j_oA0.wav
-Snare drum_nu_Bl8Pz6PE.wav,A spectrogram of snare drum_nu_bl8pz6pe,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_nu_Bl8Pz6PE.wav
-Snare drum_KjJj5-HvSvQ.wav,A spectrogram of snare drum_kjjj5-hvsvq,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_KjJj5-HvSvQ.wav
-Dog bark_Fw09tDLa-78.wav,A spectrogram of dog bark_fw09tdla-78,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_Fw09tDLa-78.wav
-Cheering_Wre8DkaPhyA.wav,A spectrogram of cheering_wre8dkaphya,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_Wre8DkaPhyA.wav
-Cheering_cYdq2fjRhcg.wav,A spectrogram of cheering_cydq2fjrhcg,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_cYdq2fjRhcg.wav
-Cheering_x6T5ambPKwg.wav,A spectrogram of cheering_x6t5ambpkwg,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_x6T5ambPKwg.wav
-Dog bark_raww5tvi85A.wav,A spectrogram of dog bark_raww5tvi85a,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_raww5tvi85A.wav
-Dog bark_nd78y2xIUuk.wav,A spectrogram of dog bark_nd78y2xiuuk,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_nd78y2xIUuk.wav
-Snare drum_VCrnnx9jTqs.wav,A spectrogram of snare drum_vcrnnx9jtqs,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_VCrnnx9jTqs.wav
-Snare drum_b98BJ36K1wo.wav,A spectrogram of snare drum_b98bj36k1wo,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_b98BJ36K1wo.wav
-Snare drum_c8gD6153aNI.wav,A spectrogram of snare drum_c8gd6153ani,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_c8gD6153aNI.wav
-Acoustic guitar_0ONdm4sW47c.wav,A spectrogram of acoustic guitar_0ondm4sw47c,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_0ONdm4sW47c.wav
-Cheering_RyPTSL-Zb3c.wav,A spectrogram of cheering_ryptsl-zb3c,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_RyPTSL-Zb3c.wav
-Cheering_lhiQ_aHj7MI.wav,A spectrogram of cheering_lhiq_ahj7mi,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_lhiQ_aHj7MI.wav
+Snare drum_xiN6XwZNEJo.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_xiN6XwZNEJo.wav
+Snare drum_frqnZb8Ssjo.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_frqnZb8Ssjo.wav
+Dog bark_yPkr1XQFNJA.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_yPkr1XQFNJA.wav
+Train horn_PE0ddraVcdI.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_PE0ddraVcdI.wav
+Acoustic guitar_nsVBasT389w.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_nsVBasT389w.wav
+Snare drum_KjJj5-HvSvQ.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_KjJj5-HvSvQ.wav
+Cheering_5upBlkwvHmg.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_5upBlkwvHmg.wav
+Snare drum_jR_wBfxgZwE.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_jR_wBfxgZwE.wav
+Dog bark_FTYgwHJUkaY.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_FTYgwHJUkaY.wav
+Train horn_ArtL_qXq5Rk.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_ArtL_qXq5Rk.wav
+Dog bark_VGpqLyx96Z8.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_VGpqLyx96Z8.wav
+Dog bark_FuTiynEpLpE.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_FuTiynEpLpE.wav
+Train horn_G958vjLYBcI.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_G958vjLYBcI.wav
+Dog bark_QHWuQj95SYw.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_QHWuQj95SYw.wav
+Train horn_UZx7OAgRMRY.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_UZx7OAgRMRY.wav
+Snare drum_Akg1n9IWSrw.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_Akg1n9IWSrw.wav
+Snare drum_G13NEVAm6-o.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_G13NEVAm6-o.wav
+Train horn_x1LeLarmp3U.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_x1LeLarmp3U.wav
+Train horn_pGaUuVZe0mQ.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_pGaUuVZe0mQ.wav
+Acoustic guitar_-5xOcMJpTUk.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_-5xOcMJpTUk.wav
+Cheering_Wre8DkaPhyA.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_Wre8DkaPhyA.wav
+Dog bark_P_dXuddk3fE.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_P_dXuddk3fE.wav
+Snare drum_8zGJ9N7c6pE.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_8zGJ9N7c6pE.wav
+Snare drum__DHMdtRRJzE.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum__DHMdtRRJzE.wav
+Cheering__j4Sv4TauOM.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering__j4Sv4TauOM.wav
+Snare drum_A446kjocnCg.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_A446kjocnCg.wav
+Acoustic guitar_j-TVVmVmygg.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_j-TVVmVmygg.wav
+Dog bark_k7SgT11PwXo.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_k7SgT11PwXo.wav
+Train horn_smO6tid5Lsk.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_smO6tid5Lsk.wav
+Snare drum_8Z2GLhocH9A.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_8Z2GLhocH9A.wav
+Train horn_IyspmEUfytc.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_IyspmEUfytc.wav
+Dog bark_P_tkRYMJK_M.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_P_tkRYMJK_M.wav
+Acoustic guitar_hbCaMcbT8to.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_hbCaMcbT8to.wav
+Snare drum_djSu_1AUt-o.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_djSu_1AUt-o.wav
+Train horn_pTRYm_peqGA.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_pTRYm_peqGA.wav
+Snare drum_ZCR7qJ2IgGI.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_ZCR7qJ2IgGI.wav
+Dog bark_EakI8v4Ztt4.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_EakI8v4Ztt4.wav
+Cheering_Zno9K9Rvlio.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_Zno9K9Rvlio.wav
+Cheering_NPDedSeMXTw.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_NPDedSeMXTw.wav
+Cheering_GIFaOp1XGs8.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_GIFaOp1XGs8.wav
+Cheering_pvM9K8h7r1k.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_pvM9K8h7r1k.wav
+Train horn_0omVgdC33FQ.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_0omVgdC33FQ.wav
+Dog bark_GamZltmhYuc.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_GamZltmhYuc.wav
+Acoustic guitar_1JwoLPCIGhs.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_1JwoLPCIGhs.wav
+Snare drum_5KvjUzQbMT4.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_5KvjUzQbMT4.wav
+Cheering_cnFjR8cfefk.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_cnFjR8cfefk.wav
+Cheering_ACm8QhYSQcQ.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_ACm8QhYSQcQ.wav
+Snare drum_iMTHDuW_xKc.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_iMTHDuW_xKc.wav
+Dog bark_yBukUnXhYnc.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_yBukUnXhYnc.wav
+Dog bark_R-rS1jnK9Wc.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_R-rS1jnK9Wc.wav
+Acoustic guitar_LTG-uVV_6q0.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_LTG-uVV_6q0.wav
+Snare drum_6og50XOZeIk.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_6og50XOZeIk.wav
+Cheering_8430QfEUpWo.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_8430QfEUpWo.wav
+Train horn_eykvth4HdUw.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_eykvth4HdUw.wav
+Acoustic guitar_a_r8wKJ8ePw.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_a_r8wKJ8ePw.wav
+Dog bark_y6tnyCHq6xE.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_y6tnyCHq6xE.wav
+Snare drum_JpMHnsdsCiY.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_JpMHnsdsCiY.wav
+Dog bark_hZ4d_dQm8jA.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_hZ4d_dQm8jA.wav
+Train horn_UjlMSYSx49k.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_UjlMSYSx49k.wav
+Dog bark_KsT1OSUHFUY.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_KsT1OSUHFUY.wav
+Snare drum_RI71ebbU0PQ.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_RI71ebbU0PQ.wav
+Dog bark_GZUC9TF1kik.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_GZUC9TF1kik.wav
+Acoustic guitar_0S5zWt91Bwo.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_0S5zWt91Bwo.wav
+Snare drum_-FFx68qSAuY.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_-FFx68qSAuY.wav
+Snare drum_7NtM1MM76s0.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_7NtM1MM76s0.wav
+Acoustic guitar_yw6uqQQF5Ig.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_yw6uqQQF5Ig.wav
+Acoustic guitar_8UhdwnsckJ8.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_8UhdwnsckJ8.wav
+Snare drum_WIuLaxWIAAI.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_WIuLaxWIAAI.wav
+Cheering_s9IS_lGiKaA.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_s9IS_lGiKaA.wav
+Train horn_JBOMYsE8s3k.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_JBOMYsE8s3k.wav
+Cheering_WhqTqqzGRng.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_WhqTqqzGRng.wav
+Cheering_L5EscAyv4a4.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_L5EscAyv4a4.wav
+Acoustic guitar_7xD_Ib3VS_w.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_7xD_Ib3VS_w.wav
+Dog bark_Ga_0YqOBcew.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_Ga_0YqOBcew.wav
+Train horn_8pAigLVDuns.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_8pAigLVDuns.wav
+Dog bark_G7vXKtePlGM.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_G7vXKtePlGM.wav
+Dog bark_Fw09tDLa-78.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_Fw09tDLa-78.wav
+Dog bark_n0P4klG9TFE.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_n0P4klG9TFE.wav
+Snare drum_gcdqffsCWI8.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_gcdqffsCWI8.wav
+Cheering_FwoJ69JvYjo.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_FwoJ69JvYjo.wav
+Snare drum_pLqa0cqsICA.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_pLqa0cqsICA.wav
+Snare drum_h-3DrDQC62k.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_h-3DrDQC62k.wav
+Dog bark_raww5tvi85A.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_raww5tvi85A.wav
+Train horn_wM9wNgY8d4g.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_wM9wNgY8d4g.wav
+Acoustic guitar_-0SdAVK79lg.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_-0SdAVK79lg.wav
+Snare drum_wS4d-q9H4NE.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_wS4d-q9H4NE.wav
+Snare drum_iBh37YAaHMU.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_iBh37YAaHMU.wav
+Train horn_sn9nx5PKbmA.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_sn9nx5PKbmA.wav
+Snare drum_O8EMm4QJjeo.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_O8EMm4QJjeo.wav
+Dog bark_id50FKUBH08.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_id50FKUBH08.wav
+Cheering_-mQR-O53mFE.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_-mQR-O53mFE.wav
+Snare drum_vf3n40mDLHw.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_vf3n40mDLHw.wav
+Cheering_0hrpu0UHkVw.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_0hrpu0UHkVw.wav
+Snare drum_VCrnnx9jTqs.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_VCrnnx9jTqs.wav
+Acoustic guitar_drJaSu3AWhQ.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_drJaSu3AWhQ.wav
+Snare drum_bJVogLOURmc.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_bJVogLOURmc.wav
+Cheering_5exxJqJLrts.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_5exxJqJLrts.wav
+Train horn_acIL82JWyq4.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_acIL82JWyq4.wav
+Cheering_lVCUaqXeBjY.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_lVCUaqXeBjY.wav
+Acoustic guitar_CzHZNJEV-3o.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_CzHZNJEV-3o.wav
+Dog bark_nd78y2xIUuk.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_nd78y2xIUuk.wav
+Snare drum_oFyhlXb7uCE.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_oFyhlXb7uCE.wav
+Snare drum_AkHaDKuiE_s.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_AkHaDKuiE_s.wav
+Acoustic guitar_3OLeJZF4oI0.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_3OLeJZF4oI0.wav
+Dog bark_k-MqG-G_H0Y.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_k-MqG-G_H0Y.wav
+Acoustic guitar_Mhvgz5AjV3U.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_Mhvgz5AjV3U.wav
+Train horn_Jd6QyMP6Mtk.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_Jd6QyMP6Mtk.wav
+Train horn_ZbfEpDs45Ek.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_ZbfEpDs45Ek.wav
+Acoustic guitar_5mut_FrB4As.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_5mut_FrB4As.wav
+Train horn_XKvLkIM8dck.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_XKvLkIM8dck.wav
+Snare drum_nrj2zTr7U0o.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_nrj2zTr7U0o.wav
+Acoustic guitar_0ONdm4sW47c.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_0ONdm4sW47c.wav
+Dog bark_h9OFJ5QSpAQ.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_h9OFJ5QSpAQ.wav
+Dog bark_Mmke73EQZ08.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_Mmke73EQZ08.wav
+Dog bark_YCy_jDZJy3Y.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_YCy_jDZJy3Y.wav
+Cheering_OGPYXJyxQ24.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_OGPYXJyxQ24.wav
+Snare drum_YSXrSxC68VM.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_YSXrSxC68VM.wav
+Train horn_fvXl_s2jCJ4.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_fvXl_s2jCJ4.wav
+Dog bark_FeRaDiSPb2c.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_FeRaDiSPb2c.wav
+Snare drum_jaJdPUAv6N0.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_jaJdPUAv6N0.wav
+Train horn_Oc9o_IKJqRw.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_Oc9o_IKJqRw.wav
+Train horn_d5sA37UOGgw.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_d5sA37UOGgw.wav
+Acoustic guitar_EBpa2CADNJA.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_EBpa2CADNJA.wav
+Cheering_gxv0RVCuw2o.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_gxv0RVCuw2o.wav
+Acoustic guitar_1o7iTDLNTFk.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_1o7iTDLNTFk.wav
+Cheering_BtwvdgECX10.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_BtwvdgECX10.wav
+Acoustic guitar_PkkhCW04O9k.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_PkkhCW04O9k.wav
+Train horn_cglysWXBmbI.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_cglysWXBmbI.wav
+Acoustic guitar_33LJ36nAozM.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_33LJ36nAozM.wav
+Cheering_7mGVgQhMQCE.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_7mGVgQhMQCE.wav
+Dog bark_mtjUgt-IUV8.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_mtjUgt-IUV8.wav
+Train horn__pUzVuWeLjM.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn__pUzVuWeLjM.wav
+Acoustic guitar_7ITwarmdyfI.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_7ITwarmdyfI.wav
+Acoustic guitar_4M0njWKFsME.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_4M0njWKFsME.wav
+Snare drum_CxgVq6eovRU.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_CxgVq6eovRU.wav
+Cheering_lhiQ_aHj7MI.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_lhiQ_aHj7MI.wav
+Train horn_zP_NEorPQnE.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_zP_NEorPQnE.wav
+Dog bark_TDBqWGhnoLM.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_TDBqWGhnoLM.wav
+Train horn_LK4b2eJpy24.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_LK4b2eJpy24.wav
+Cheering_UZYDN3DBkAk.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_UZYDN3DBkAk.wav
+Acoustic guitar_ET7yQfaiF_8.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_ET7yQfaiF_8.wav
+Snare drum_PG1nKnvHjYI.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_PG1nKnvHjYI.wav
+Cheering_4AZPDLhB--g.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_4AZPDLhB--g.wav
+Snare drum_zw5gs3uLvV0.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_zw5gs3uLvV0.wav
+Dog bark_WkU6zXSeKH8.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_WkU6zXSeKH8.wav
+Cheering_Bc6AIHASWxI.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_Bc6AIHASWxI.wav
+Acoustic guitar_XWVGQbfpA0k.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_XWVGQbfpA0k.wav
+Acoustic guitar_kmZFn-CQ19A.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_kmZFn-CQ19A.wav
+Dog bark_8cDXwosw9nA.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_8cDXwosw9nA.wav
+Dog bark_tYA0D-S_30k.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_tYA0D-S_30k.wav
+Cheering_cYdq2fjRhcg.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_cYdq2fjRhcg.wav
+Snare drum_ow12iGt8z5Q.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_ow12iGt8z5Q.wav
+Cheering_hEQG_EdBTGI.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_hEQG_EdBTGI.wav
+Dog bark_64K4SlYR3BU.png,A spectrogram of Dog bark,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Dog bark_64K4SlYR3BU.wav
+Snare drum_OWbfAmrFdp8.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_OWbfAmrFdp8.wav
+Train horn_if5kBcYKZ_I.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_if5kBcYKZ_I.wav
+Snare drum_pdOskdFwRPg.png,A spectrogram of Snare drum,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Snare drum_pdOskdFwRPg.wav
+Train horn_yBVxtq9k8Sg.png,A spectrogram of Train horn,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Train horn_yBVxtq9k8Sg.wav
+Cheering_vvi1hCoFAgo.png,A spectrogram of Cheering,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Cheering_vvi1hCoFAgo.wav
+Acoustic guitar_GW6pti04qIo.png,A spectrogram of Acoustic guitar,/home/ryan/diss/msc_diss/sdspeech/data/AudioSet/data/dataset/val/Acoustic guitar_GW6pti04qIo.wav

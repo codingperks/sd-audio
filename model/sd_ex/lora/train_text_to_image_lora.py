@@ -1109,7 +1109,7 @@ def main():
                 
                 validation_prompts = [args.validation_prompt, args.validation_prompt2, args.validation_prompt3, args.validation_prompt4, args.validation_prompt5]
                 
-                for prompt in enumerate(validation_prompts):
+                for prompt in validation_prompts:
                     images = []
                     for _ in range(args.num_validation_images):
                         images.append(

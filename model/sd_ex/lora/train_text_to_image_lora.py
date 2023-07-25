@@ -49,7 +49,7 @@ from diffusers.utils.import_utils import is_xformers_available
 
 import sys
 sys.path.append('../../../data')
-from data.AudioSet.data_pipeline import WavPreprocessor
+from AudioSet.data_pipeline import WavPreprocessor
 from utils.spectrogram_params import SpectrogramParams
 from utils.spectrogram_image_converter import SpectrogramImageConverter
 import typing as T
@@ -875,7 +875,7 @@ def main():
                 # Collect data to log after loop
                 wandb.log({"train_input/training_images": wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}")}, commit=False)
                 wandb.log({"train_input/training_audio": wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
-                wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(preprocessor.spec_to_wav(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
+                wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space
@@ -1020,7 +1020,7 @@ def main():
                 # Log random validation data
                 val_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
                 val_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
-                val_images_audio_log.append(wandb.Audio(preprocessor.spec_to_wav(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+                val_images_audio_log.append(wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
 
                 with torch.no_grad():  # disable gradient calculation
 
@@ -1119,7 +1119,7 @@ def main():
                     wandb.log(
                         {
                             f"val_inf/validation_inference_image": [wandb.Image(image, caption=f"{i}: {prompt}") for i, image in enumerate(images)],
-                            f"val_inf/validation_inference_audio": [wandb.Audio(preprocessor.spec_to_wav(image), sample_rate=44100, caption=f"{i}: {prompt}") for i, image in enumerate(images)]
+                            f"val_inf/validation_inference_audio": [wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate=44100, caption=f"{i}: {prompt}") for i, image in enumerate(images)]
                         },
                         commit=False
                     )
@@ -1192,7 +1192,7 @@ def main():
                     for i, image in enumerate(images)
                 ],                                
                 "test/test_audio": [
-                    wandb.Audio(preprocessor.spec_to_wav(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
+                    wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
                     for i, image in enumerate(images)
                 ]
             }

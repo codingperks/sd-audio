@@ -78,14 +78,28 @@ class WavPreprocessor:
 
     def spec_to_wav(self, spec_path):
         # Convert path to image
-        if spec_path is not isinstance(spec_path, Image.Image):
-            spec_path = Image.open(spec_path)
+        #if spec_path is not isinstance(spec_path, Image.Image):
+        #    spec_path = Image.open(spec_path)
     
         # Convert segment to image
         segment = self._converter.audio_from_spectrogram_image(
             image=spec_path
         )
         
+        return segment
+    
+    def spec_to_wav_np(self, spec_path):
+        # Convert path to image
+        #if spec_path is not isinstance(spec_path, Image.Image):
+        #    spec_path = Image.open(spec_path)
+    
+        # Convert segment to image
+        segment = self._converter.audio_from_spectrogram_image(
+            image=spec_path
+        )
+        segment = segment.get_array_of_samples()
+        segment = np.array(segment)
+
         return segment
          
     def spec_to_wav_folder(self, input_path, output_path):       

@@ -49,6 +49,7 @@ from diffusers.utils.import_utils import is_xformers_available
 
 import sys
 sys.path.append('../../../data')
+from data.AudioSet.data_pipeline import WavPreprocessor
 from utils.spectrogram_params import SpectrogramParams
 from utils.spectrogram_image_converter import SpectrogramImageConverter
 import typing as T
@@ -61,7 +62,6 @@ from torchvision.transforms.functional import to_pil_image
 check_min_version("0.18.0.dev0")
 
 logger = get_logger(__name__, log_level="INFO")
-
 
 def save_model_card(repo_id: str, images=None, base_model=str, dataset_name=str, repo_folder=None):
     img_str = ""
@@ -90,7 +90,7 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
     with open(os.path.join(repo_folder, "README.md"), "w") as f:
         f.write(yaml + model_card)
 
-def image_to_audio(image):
+""" def image_to_audio(image):
      # Define named sets of parameters
     param_sets: T.Dict[str, SpectrogramParams] = {}
     
@@ -115,7 +115,19 @@ def image_to_audio(image):
     segment = segment.get_array_of_samples()
     segment = np.array(segment)
 
-    return segment
+    return segment """
+    
+
+spec_params = SpectrogramParams(
+    sample_rate=44100,
+    stereo=False,
+    step_size_ms=20,
+    min_frequency=20,
+    max_frequency=20000,
+    num_frequencies=512,
+)
+preprocessor = WavPreprocessor(spec_params)
+
 
 
 def parse_args():
@@ -863,7 +875,7 @@ def main():
                 # Collect data to log after loop
                 wandb.log({"train_input/training_images": wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}")}, commit=False)
                 wandb.log({"train_input/training_audio": wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
-                wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
+                wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(preprocessor.spec_to_wav(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space
@@ -1008,7 +1020,7 @@ def main():
                 # Log random validation data
                 val_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
                 val_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
-                val_images_audio_log.append(wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+                val_images_audio_log.append(wandb.Audio(preprocessor.spec_to_wav(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
 
                 with torch.no_grad():  # disable gradient calculation
 
@@ -1107,7 +1119,7 @@ def main():
                     wandb.log(
                         {
                             f"val_inf/validation_inference_image": [wandb.Image(image, caption=f"{i}: {prompt}") for i, image in enumerate(images)],
-                            f"val_inf/validation_inference_audio": [wandb.Audio(image_to_audio(image), sample_rate=44100, caption=f"{i}: {prompt}") for i, image in enumerate(images)]
+                            f"val_inf/validation_inference_audio": [wandb.Audio(preprocessor.spec_to_wav(image), sample_rate=44100, caption=f"{i}: {prompt}") for i, image in enumerate(images)]
                         },
                         commit=False
                     )
@@ -1180,7 +1192,7 @@ def main():
                     for i, image in enumerate(images)
                 ],                                
                 "test/test_audio": [
-                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
+                    wandb.Audio(preprocessor.spec_to_wav(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
                     for i, image in enumerate(images)
                 ]
             }

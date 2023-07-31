@@ -56,6 +56,7 @@ import typing as T
 from torchvision.utils import make_grid
 from PIL import Image
 from torchvision.transforms.functional import to_pil_image
+import soundfile as sf
 
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
@@ -420,7 +421,7 @@ DATASET_NAME_MAPPING = {
 def main():
     args = parse_args()
     logging_dir = Path(args.output_dir, args.logging_dir)
-
+    
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
 
     accelerator = Accelerator(
@@ -785,7 +786,6 @@ def main():
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     global_step = 0
     first_epoch = 0
-    epoch_ = -1 # for logging
     val_step = 0
 
     # Potentially load in the weights and states from a previous save
@@ -829,6 +829,13 @@ def main():
 
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
+            
+            # GL DEBUG CHECKPOINT
+            #image_pil = Image.open(batch["pixel_values"])
+            #sf.write("./gl-debug/cnv-1.wav", preprocessor.spec_to_wav(image_pil), 44100)
+            #sf.write("./gl-debug/cnv-1_np.wav", preprocessor.spec_to_wav_np(batch["pixel_values"]), 44100)
+            #sf.write("./gl-debug/cnv-2.wav", preprocessor.spec_to_wav(to_pil_image(batch["pixel_values"][0]), 44100))
+
             if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
                 if step % args.gradient_accumulation_steps == 0:
                     progress_bar.update(1)
@@ -843,13 +850,21 @@ def main():
                 audio_data = audio_data.mean(dim=0)
             else:
                 audio_data = audio_data
-                
+            
+            sf.write(f"./gl-debug/{step}_cnv-2_og_np.wav", audio_data.cpu().numpy(), 44100)
+            sf.write(f"./gl-debug/{step}_cnv-2_np.wav", preprocessor.spec_to_wav_np(image), 44100)
+
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 # Collect data to log after loop
                 wandb.log({"train_input/training_images": wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}")}, commit=False)
                 wandb.log({"train_input/training_audio": wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
                 wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
+
+            #sf.write("./gl-debug/cnv-3.wav", preprocessor.spec_to_wav(image, 44100))
+            sf.write(f"./gl-debug/{step}_cnv-3_og_np_.wav", audio_data.cpu().numpy(), 44100)
+            sf.write(f"./gl-debug/{step}_cnv-3_np_.wav", preprocessor.spec_to_wav_np(image), 44100)
+
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space

@@ -91,6 +91,9 @@ class WavPreprocessor:
         # Generate the spectrogram
         image = self._converter.spectrogram_image_from_audio(segment)
         
+        # Crop width to 512
+        image = image.crop((0, 0, 512, 512))
+
         return image
 
     def wav_to_spec_folder(self, input_path):

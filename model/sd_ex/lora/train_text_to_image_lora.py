@@ -90,34 +90,8 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
     with open(os.path.join(repo_folder, "README.md"), "w") as f:
         f.write(yaml + model_card)
 
-""" def image_to_audio(image):
-     # Define named sets of parameters
-    param_sets: T.Dict[str, SpectrogramParams] = {}
-    
-    param_sets["default"] = SpectrogramParams(
-        sample_rate=44100,
-        stereo=False,
-        step_size_ms=20,
-        min_frequency=20,
-        max_frequency=20000,
-        num_frequencies=512,
-    )
-    
-    converter = SpectrogramImageConverter(params=param_sets["default"], device="cuda")
-    segment = converter.audio_from_spectrogram_image(
-        image=image,
-        apply_filters=False
-    )
-    
-    # Convert to mono
-    # segment = segment.set_channels(1)
-
-    segment = segment.get_array_of_samples()
-    segment = np.array(segment)
-
-    return segment """
-    
-
+ 
+ # to do - add this to full robust pipeline
 spec_params = SpectrogramParams(
     sample_rate=44100,
     stereo=False,
@@ -702,7 +676,7 @@ def main():
             transforms.CenterCrop(args.resolution) if args.center_crop else transforms.RandomCrop(args.resolution),
             transforms.RandomHorizontalFlip() if args.random_flip else transforms.Lambda(lambda x: x),
             transforms.ToTensor(),
-            transforms.Normalize([0.5], [0.5]),
+            # transforms.Normalize([0.5], [0.5]),
         ]
     )
     
@@ -1108,21 +1082,32 @@ def main():
                     generator = generator.manual_seed(args.seed)
                 
                 validation_prompts = [args.validation_prompt, args.validation_prompt2, args.validation_prompt3, args.validation_prompt4, args.validation_prompt5]
-                
-                for prompt in validation_prompts:
-                    images = []
-                    for _ in range(args.num_validation_images):
-                        images.append(
-                            pipeline(prompt, num_inference_steps=30, generator=generator).images[0]
-                        )
+                images = []
+                audios = []
+                image_prompts = []
+                audio_prompts = []
 
-                    wandb.log(
-                        {
-                            f"val_inf/validation_inference_image": [wandb.Image(image, caption=f"{i}: {prompt}") for i, image in enumerate(images)],
-                            f"val_inf/validation_inference_audio": [wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate=44100, caption=f"{i}: {prompt}") for i, image in enumerate(images)]
-                        },
-                        commit=False
-                    )
+                for prompt in validation_prompts:
+                    for _ in range(args.num_validation_images):
+                        img = pipeline(prompt, num_inference_steps=30, generator=generator).images[0]
+                        audio = preprocessor.spec_to_wav_np(img)
+                        
+                        images.append(img)
+                        audios.append(audio)
+                        image_prompts.append(prompt)
+                        audio_prompts.append(prompt)
+
+                image_logs = [wandb.Image(image, caption=f"{i}: {image_prompts[i]}") for i, image in enumerate(images)]
+                audio_logs = [wandb.Audio(audio, sample_rate=44100, caption=f"{i}: {audio_prompts[i]}") for i, audio in enumerate(audios)]
+
+                wandb.log(
+                    {
+                        f"val_inf/validation_inference_image": image_logs,
+                        f"val_inf/validation_inference_audio": audio_logs
+                    },
+                    commit=False
+                )
+
 
                 """                 for tracker in accelerator.trackers:
                                     if tracker.name == "tensorboard":

@@ -49,6 +49,7 @@ from diffusers.utils.import_utils import is_xformers_available
 
 import sys
 sys.path.append('../../../data')
+from AudioSet.data_pipeline import WavPreprocessor
 from utils.spectrogram_params import SpectrogramParams
 from utils.spectrogram_image_converter import SpectrogramImageConverter
 import typing as T
@@ -61,7 +62,6 @@ from torchvision.transforms.functional import to_pil_image
 check_min_version("0.18.0.dev0")
 
 logger = get_logger(__name__, log_level="INFO")
-
 
 def save_model_card(repo_id: str, images=None, base_model=str, dataset_name=str, repo_folder=None):
     img_str = ""
@@ -90,32 +90,18 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
     with open(os.path.join(repo_folder, "README.md"), "w") as f:
         f.write(yaml + model_card)
 
-def image_to_audio(image):
-     # Define named sets of parameters
-    param_sets: T.Dict[str, SpectrogramParams] = {}
-    
-    param_sets["default"] = SpectrogramParams(
-        sample_rate=44100,
-        stereo=False,
-        step_size_ms=20,
-        min_frequency=20,
-        max_frequency=20000,
-        num_frequencies=512,
-    )
-    
-    converter = SpectrogramImageConverter(params=param_sets["default"], device="cuda")
-    segment = converter.audio_from_spectrogram_image(
-        image=image,
-        apply_filters=False
-    )
-    
-    # Convert to mono
-    # segment = segment.set_channels(1)
+ 
+ # to do - add this to full robust pipeline
+spec_params = SpectrogramParams(
+    sample_rate=44100,
+    stereo=False,
+    step_size_ms=20,
+    min_frequency=20,
+    max_frequency=20000,
+    num_frequencies=512,
+)
+preprocessor = WavPreprocessor(spec_params)
 
-    segment = segment.get_array_of_samples()
-    segment = np.array(segment)
-
-    return segment
 
 
 def parse_args():
@@ -180,6 +166,18 @@ def parse_args():
     )
     parser.add_argument(
         "--validation_prompt", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
+        "--validation_prompt2", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
+        "--validation_prompt3", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
+        "--validation_prompt4", type=str, default=None, help="A prompt that is sampled during training for inference."
+    )
+    parser.add_argument(
+        "--validation_prompt5", type=str, default=None, help="A prompt that is sampled during training for inference."
     )
     parser.add_argument(
         "--num_validation_images",
@@ -678,7 +676,7 @@ def main():
             transforms.CenterCrop(args.resolution) if args.center_crop else transforms.RandomCrop(args.resolution),
             transforms.RandomHorizontalFlip() if args.random_flip else transforms.Lambda(lambda x: x),
             transforms.ToTensor(),
-            transforms.Normalize([0.5], [0.5]),
+            # transforms.Normalize([0.5], [0.5]),
         ]
     )
     
@@ -845,12 +843,13 @@ def main():
                 audio_data = audio_data.mean(dim=0)
             else:
                 audio_data = audio_data
+                
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 # Collect data to log after loop
-                train_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
-                train_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
-                train_images_audio_log.append(wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+                wandb.log({"train_input/training_images": wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}")}, commit=False)
+                wandb.log({"train_input/training_audio": wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
+                wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space
@@ -963,12 +962,6 @@ def main():
             logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(**logs)
             
-        # Log the batch of training images and audio every 10 epochs
-        if epoch == 0 or epoch % 10 == 0:
-            wandb.log({"train_input/training_images": train_images_log}, commit=False)
-            wandb.log({"train_input/training_audio": train_audio_log}, commit=False)
-            wandb.log({"train_input/training_images_audio (LOSSY)": train_images_audio_log}, commit=False)
-
         avg_train_loss_per_epoch = train_loss / len(train_dataloader)
         accelerator.log({"avg_train_loss_per_epoch": avg_train_loss_per_epoch}, step=global_step)
         
@@ -984,7 +977,8 @@ def main():
             val_images_audio_log = []
 
             for step, batch in enumerate(val_dataloader):
-                val_step += 1
+                val_step += 1        
+
                 #logger.info(f"Starting val step {step}, global step {global_step}")
                 pixel_values = batch["pixel_values"]
                 image = to_pil_image(pixel_values[0])
@@ -997,10 +991,10 @@ def main():
                 else:
                     audio_data = audio_data
                     
-                # Collect data to log after loop
+                # Log random validation data
                 val_images_log.append(wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"))
                 val_audio_log.append(wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
-                val_images_audio_log.append(wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
+                val_images_audio_log.append(wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}"))
 
                 with torch.no_grad():  # disable gradient calculation
 
@@ -1048,10 +1042,18 @@ def main():
 
                     #accelerator.log({"val_step_loss": avg_val_loss_per_step}, step=global_step) # log the per-step average validation loss
                     
-            wandb.log({"val_input/validation_images": val_images_log}, commit=False)
-            wandb.log({"val_input/validation_audio": val_audio_log}, commit=False)
-            wandb.log({"val_input/validation_images_audio (LOSSY)": val_images_audio_log}, commit=False)
-                            
+            # At the end of each epoch, randomly select one sample to log
+            random_index = torch.randint(high=len(val_images_log), size=(1,)).item()
+
+            # Extract the selected image and audio
+            selected_image = val_images_log[random_index]
+            selected_audio = val_audio_log[random_index]
+            selected_image_audio = val_images_audio_log[random_index]
+        
+            wandb.log({"val_input/validation_images": selected_image}, commit=False)
+            wandb.log({"val_input/validation_audio": selected_audio}, commit=False)
+            wandb.log({"val_input/validation_images_audio (LOSSY)": selected_image_audio}, commit=False)
+
             avg_valid_loss_per_epoch = valid_loss / len(val_dataloader) # calculate average validation loss per epoch
             logger.info(f"Average validation loss for Epoch {epoch} is {avg_valid_loss_per_epoch}")
             accelerator.log({"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch}, step=global_step) # log the average validation loss per epoch
@@ -1078,25 +1080,34 @@ def main():
                 generator = torch.Generator(device=accelerator.device)
                 if args.seed is not None:
                     generator = generator.manual_seed(args.seed)
+                
+                validation_prompts = [args.validation_prompt, args.validation_prompt2, args.validation_prompt3, args.validation_prompt4, args.validation_prompt5]
                 images = []
-                for _ in range(args.num_validation_images):
-                    images.append(
-                        pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0]
-                    )
-                    
+                audios = []
+                image_prompts = []
+                audio_prompts = []
+
+                for prompt in validation_prompts:
+                    for _ in range(args.num_validation_images):
+                        img = pipeline(prompt, num_inference_steps=30, generator=generator).images[0]
+                        audio = preprocessor.spec_to_wav_np(img)
+                        
+                        images.append(img)
+                        audios.append(audio)
+                        image_prompts.append(prompt)
+                        audio_prompts.append(prompt)
+
+                image_logs = [wandb.Image(image, caption=f"{i}: {image_prompts[i]}") for i, image in enumerate(images)]
+                audio_logs = [wandb.Audio(audio, sample_rate=44100, caption=f"{i}: {audio_prompts[i]}") for i, audio in enumerate(audios)]
+
                 wandb.log(
-                            {
-                                "val_inf/validation_inference_image": [
-                                    wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
-                                    for i, image in enumerate(images)
-                                ],
-                                "val_inf/validation_inference_audio": [
-                                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
-                                    for i, image in enumerate(images)
-                                ]
-                            },
-                            commit = False
-                        )
+                    {
+                        f"val_inf/validation_inference_image": image_logs,
+                        f"val_inf/validation_inference_audio": audio_logs
+                    },
+                    commit=False
+                )
+
 
                 """                 for tracker in accelerator.trackers:
                                     if tracker.name == "tensorboard":
@@ -1166,7 +1177,7 @@ def main():
                     for i, image in enumerate(images)
                 ],                                
                 "test/test_audio": [
-                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
+                    wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}")
                     for i, image in enumerate(images)
                 ]
             }

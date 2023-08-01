@@ -94,6 +94,7 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
  
  # to do - add this to full robust pipeline
 spec_params = SpectrogramParams(
+<<<<<<< HEAD
         sample_rate=44100,
         stereo=False,
         step_size_ms=(10 / 512) * 1000,
@@ -101,6 +102,15 @@ spec_params = SpectrogramParams(
         max_frequency=20000,
         num_frequencies=512,
     )
+=======
+    sample_rate=44100,
+    stereo=False,
+    step_size_ms=20,
+    min_frequency=20,
+    max_frequency=20000,
+    num_frequencies=512,
+)
+>>>>>>> 88ac679877ad45b524052b471c29015517c7cf43
 preprocessor = WavPreprocessor(spec_params)
 
 
@@ -829,13 +839,6 @@ def main():
 
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
-            
-            # GL DEBUG CHECKPOINT
-            #image_pil = Image.open(batch["pixel_values"])
-            #sf.write("./gl-debug/cnv-1.wav", preprocessor.spec_to_wav(image_pil), 44100)
-            #sf.write("./gl-debug/cnv-1_np.wav", preprocessor.spec_to_wav_np(batch["pixel_values"]), 44100)
-            #sf.write("./gl-debug/cnv-2.wav", preprocessor.spec_to_wav(to_pil_image(batch["pixel_values"][0]), 44100))
-
             if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
                 if step % args.gradient_accumulation_steps == 0:
                     progress_bar.update(1)
@@ -851,20 +854,12 @@ def main():
             else:
                 audio_data = audio_data
             
-            #sf.write(f"./gl-debug/{step}_cnv-2_og_np.wav", audio_data.cpu().numpy(), 44100)
-            #sf.write(f"./gl-debug/{step}_cnv-2_np.wav", preprocessor.spec_to_wav_np(image), 44100)
-
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 # Collect data to log after loop
                 wandb.log({"train_input/training_images": wandb.Image(batch["pixel_values"], caption=f"Epoch {epoch} Step {step}")}, commit=False)
                 wandb.log({"train_input/training_audio": wandb.Audio(audio_data.cpu().numpy(), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
                 wandb.log({"train_input/training_images_audio (LOSSY)": wandb.Audio(preprocessor.spec_to_wav_np(image), sample_rate = 44100, caption=f"Epoch {epoch} Step {step}")}, commit=False)
-
-            #sf.write("./gl-debug/cnv-3.wav", preprocessor.spec_to_wav(image, 44100))
-            #sf.write(f"./gl-debug/{step}_cnv-3_og_np_.wav", audio_data.cpu().numpy(), 44100)
-            #sf.write(f"./gl-debug/{step}_cnv-3_np_.wav", preprocessor.spec_to_wav_np(image), 44100)
-
 
             with accelerator.accumulate(unet):
                 # Convert images to latent space

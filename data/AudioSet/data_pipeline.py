@@ -30,7 +30,6 @@ class WavPreprocessor:
         
         return y_resampled, target_sr
     
-
     def resample_folder(self, input_path, target_sr):
         for filename in os.listdir(input_path):
             if filename.endswith('.wav'):
@@ -46,6 +45,7 @@ class WavPreprocessor:
         normalised_y = y / np.max(np.abs(y))
         
         return normalised_y, sr
+
     
     def adjust_length(self, audio_clip, sample_rate):
         desired_length = 10 * sample_rate  # 10 seconds * sample_rate
@@ -91,8 +91,10 @@ class WavPreprocessor:
         # Generate the spectrogram
         image = self._converter.spectrogram_image_from_audio(segment)
         
+
         # Crop width to 512
         image = image.crop((0, 0, 512, 512))
+
 
         return image
 
@@ -323,7 +325,10 @@ class DatasetPipeline:
                 continue
             folder_path = os.path.join(self._dataset_path, folder)  # Full path to the folder
             self._preprocessor.resample_folder(folder_path, target_sr)
+<<<<<<< HEAD
             self._preprocessor.adjust_length_folder(folder_path)
+=======
+>>>>>>> 88ac679877ad45b524052b471c29015517c7cf43
             self._preprocessor.min_max_normalise_folder(folder_path)
             self._preprocessor.wav_to_spec_folder(folder_path)
 

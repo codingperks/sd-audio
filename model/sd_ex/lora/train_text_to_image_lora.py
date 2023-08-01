@@ -56,6 +56,7 @@ import typing as T
 from torchvision.utils import make_grid
 from PIL import Image
 from torchvision.transforms.functional import to_pil_image
+import soundfile as sf
 
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
@@ -93,6 +94,15 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
  
  # to do - add this to full robust pipeline
 spec_params = SpectrogramParams(
+<<<<<<< HEAD
+        sample_rate=44100,
+        stereo=False,
+        step_size_ms=(10 / 512) * 1000,
+        min_frequency=20,
+        max_frequency=20000,
+        num_frequencies=512,
+    )
+=======
     sample_rate=44100,
     stereo=False,
     step_size_ms=20,
@@ -100,6 +110,7 @@ spec_params = SpectrogramParams(
     max_frequency=20000,
     num_frequencies=512,
 )
+>>>>>>> 88ac679877ad45b524052b471c29015517c7cf43
 preprocessor = WavPreprocessor(spec_params)
 
 
@@ -420,7 +431,7 @@ DATASET_NAME_MAPPING = {
 def main():
     args = parse_args()
     logging_dir = Path(args.output_dir, args.logging_dir)
-
+    
     accelerator_project_config = ProjectConfiguration(project_dir=args.output_dir, logging_dir=logging_dir)
 
     accelerator = Accelerator(
@@ -785,7 +796,6 @@ def main():
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     global_step = 0
     first_epoch = 0
-    epoch_ = -1 # for logging
     val_step = 0
 
     # Potentially load in the weights and states from a previous save
@@ -843,7 +853,7 @@ def main():
                 audio_data = audio_data.mean(dim=0)
             else:
                 audio_data = audio_data
-                
+            
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 # Collect data to log after loop

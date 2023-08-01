@@ -29,7 +29,7 @@ class WavPreprocessor:
         y_resampled = librosa.resample(y=y, orig_sr=sr, target_sr=target_sr)
         
         return y_resampled, target_sr
-
+    
     def resample_folder(self, input_path, target_sr):
         for filename in os.listdir(input_path):
             if filename.endswith('.wav'):
@@ -45,6 +45,32 @@ class WavPreprocessor:
         normalised_y = y / np.max(np.abs(y))
         
         return normalised_y, sr
+
+    
+    def adjust_length(self, audio_clip, sample_rate):
+        desired_length = 10 * sample_rate  # 10 seconds * sample_rate
+
+        # If the audio clip is longer than 10 seconds, shorten it
+        if len(audio_clip) > desired_length:
+            return audio_clip[:desired_length]
+        
+        # If the audio clip is shorter than 10 seconds, pad it with zeros
+        elif len(audio_clip) < desired_length:
+            return np.pad(audio_clip, (0, desired_length - len(audio_clip)))
+        
+        # If the audio clip is exactly 10 seconds, return it as is
+        else:
+            return audio_clip
+        
+    def adjust_length_folder(self, input_path):
+        for filename in os.listdir(input_path):
+            if filename.endswith('.wav'):
+                path = os.path.join(input_path, filename)
+                audio_clip, sr = librosa.load(path, sr=None)
+                adjusted_audio = self.adjust_length(audio_clip, sr)
+                
+                save_path = os.path.join(input_path, filename) # Overwrite the original file
+                sf.write(save_path, adjusted_audio, sr)
 
     def min_max_normalise_folder(self, input_path):
         for filename in os.listdir(input_path):
@@ -65,6 +91,11 @@ class WavPreprocessor:
         # Generate the spectrogram
         image = self._converter.spectrogram_image_from_audio(segment)
         
+
+        # Crop width to 512
+        image = image.crop((0, 0, 512, 512))
+
+
         return image
 
     def wav_to_spec_folder(self, input_path):
@@ -294,6 +325,10 @@ class DatasetPipeline:
                 continue
             folder_path = os.path.join(self._dataset_path, folder)  # Full path to the folder
             self._preprocessor.resample_folder(folder_path, target_sr)
+<<<<<<< HEAD
+            self._preprocessor.adjust_length_folder(folder_path)
+=======
+>>>>>>> 88ac679877ad45b524052b471c29015517c7cf43
             self._preprocessor.min_max_normalise_folder(folder_path)
             self._preprocessor.wav_to_spec_folder(folder_path)
 

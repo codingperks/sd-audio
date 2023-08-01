@@ -31,7 +31,7 @@ class WavPreprocessor:
         y_resampled = librosa.resample(y=y, orig_sr=sr, target_sr=target_sr)
 
         return y_resampled, target_sr
-
+    
     def resample_folder(self, input_path, target_sr):
         for filename in os.listdir(input_path):
             if filename.endswith(".wav"):
@@ -75,6 +75,7 @@ class WavPreprocessor:
                 save_path = os.path.join(
                     input_path, filename
                 )  # Overwrite the original file
+
                 sf.write(save_path, adjusted_audio, sr)
 
     def min_max_normalise_folder(self, input_path):
@@ -97,6 +98,7 @@ class WavPreprocessor:
 
         # Generate the spectrogram
         image = self._converter.spectrogram_image_from_audio(segment)
+
 
         # Crop width to 512
         image = image.crop((0, 0, 512, 512))

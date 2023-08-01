@@ -103,13 +103,13 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
 
 # to do - add this to full robust pipeline
 spec_params = SpectrogramParams(
-    sample_rate=44100,
-    stereo=False,
-    step_size_ms=(10 / 512) * 1000,
-    min_frequency=20,
-    max_frequency=20000,
-    num_frequencies=512,
-)
+        sample_rate=44100,
+        stereo=False,
+        step_size_ms=(10 / 512) * 1000,
+        min_frequency=20,
+        max_frequency=20000,
+        num_frequencies=512,
+    )
 preprocessor = WavPreprocessor(spec_params)
 
 
@@ -1000,7 +1000,7 @@ def main():
                 audio_data = audio_data.mean(dim=0)
             else:
                 audio_data = audio_data
-
+   
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 # Collect data to log after loop

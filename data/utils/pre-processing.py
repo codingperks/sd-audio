@@ -1,5 +1,6 @@
 from PIL import Image
 
+
 class preprocessor:
     def crop_and_resize(image_path, output_path, size):
         # Open the image
@@ -19,7 +20,7 @@ class preprocessor:
 
         # Save the resized image
         resized_image.save(output_path)
-        
+
     def rotate_image(image_path, output_path, angle):
         # Open image
         image = Image.open(image_path)

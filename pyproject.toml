@@ -1,0 +1,7 @@
+[tool.black]
+exclude = '''
+(
+      /model/sd_ex/lora/out
+    | \.ipynb
+)
+'''

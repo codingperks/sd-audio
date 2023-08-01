@@ -94,7 +94,6 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
  
  # to do - add this to full robust pipeline
 spec_params = SpectrogramParams(
-<<<<<<< HEAD
         sample_rate=44100,
         stereo=False,
         step_size_ms=(10 / 512) * 1000,
@@ -102,17 +101,7 @@ spec_params = SpectrogramParams(
         max_frequency=20000,
         num_frequencies=512,
     )
-=======
-    sample_rate=44100,
-    stereo=False,
-    step_size_ms=20,
-    min_frequency=20,
-    max_frequency=20000,
-    num_frequencies=512,
-)
->>>>>>> 88ac679877ad45b524052b471c29015517c7cf43
 preprocessor = WavPreprocessor(spec_params)
-
 
 
 def parse_args():

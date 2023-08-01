@@ -29,7 +29,7 @@ class WavPreprocessor:
         y_resampled = librosa.resample(y=y, orig_sr=sr, target_sr=target_sr)
         
         return y_resampled, target_sr
-    
+        
     def resample_folder(self, input_path, target_sr):
         for filename in os.listdir(input_path):
             if filename.endswith('.wav'):
@@ -325,10 +325,7 @@ class DatasetPipeline:
                 continue
             folder_path = os.path.join(self._dataset_path, folder)  # Full path to the folder
             self._preprocessor.resample_folder(folder_path, target_sr)
-<<<<<<< HEAD
             self._preprocessor.adjust_length_folder(folder_path)
-=======
->>>>>>> 88ac679877ad45b524052b471c29015517c7cf43
             self._preprocessor.min_max_normalise_folder(folder_path)
             self._preprocessor.wav_to_spec_folder(folder_path)
 

@@ -969,6 +969,8 @@ def main():
         disable=not accelerator.is_local_main_process,
     )
     progress_bar.set_description("Steps")
+    
+    min_val = 99999999 # used for checkpointing
 
     for epoch in range(first_epoch, args.num_train_epochs):
         logger.info(f"Starting epoch {epoch}")
@@ -1192,7 +1194,7 @@ def main():
 
         # reset training loss for next epoch
         train_loss = 0.0
-
+        
         # VALIDATION LOOP
         if epoch % args.validation_epochs == 0:
             unet.eval()  # set model to evaluation mode
@@ -1310,8 +1312,6 @@ def main():
                     )
                     logger.info(f"Cumulative validation average loss is {valid_loss}")
 
-                    # accelerator.log({"val_step_loss": avg_val_loss_per_step}, step=global_step) # log the per-step average validation loss
-
             # At the end of each epoch, randomly select one sample to log
             random_index = torch.randint(high=len(val_images_log), size=(1,)).item()
 
@@ -1336,6 +1336,16 @@ def main():
             accelerator.log(
                 {"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch}, step=global_step
             )  # log the average validation loss per epoch
+            
+            # Save best performing checkpoint
+            if avg_valid_loss_per_epoch < min_val:
+                min_val = avg_valid_loss_per_epoch
+                save_path = os.path.join(
+                    args.output_dir, f"checkpoint-{global_step}-best"
+                )
+
+                accelerator.save_state(save_path)
+                
 
         if global_step >= args.max_train_steps:
             break
@@ -1406,27 +1416,16 @@ def main():
                     commit=False,
                 )
 
-                """                 for tracker in accelerator.trackers:
-                                    if tracker.name == "tensorboard":
-                                        np_images = np.stack([np.asarray(img) for img in images])
-                                        tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
-                                    if tracker.name == "wandb":
-                                        tracker.log(
-                                            {
-                                                "val_inf/validation_inference_image": [
-                                                    wandb.Image(image, caption=f"{i}: {args.validation_prompt}", commit=False)
-                                                    for i, image in enumerate(images)
-                                                ],
-                                                "val_inf/validation_inference_audio": [
-                                                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}", commit=False)
-                                                    for i, image in enumerate(images)
-                                                ]
-                                            }
-                                        ) """
-
                 del pipeline
                 torch.cuda.empty_cache()
+                
+    # Save final model
+    save_path = os.path.join(
+        args.output_dir, f"checkpoint-{global_step}-final"
+    )
 
+    accelerator.save_state(save_path)
+                
     # Save the lora layers
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
@@ -1489,20 +1488,6 @@ def main():
                 ],
             }
         )
-        """         for tracker in accelerator.trackers:
-                    if len(images) != 0:
-                        if tracker.name == "tensorboard":
-                            np_images = np.stack([np.asarray(img) for img in images])
-                            tracker.writer.add_images("test", np_images, epoch, dataformats="NHWC")
-                        if tracker.name == "wandb":
-                            tracker.log(
-                                {
-                                    "test/test": [
-                                        wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
-                                        for i, image in enumerate(images)
-                                    ]
-                                }
-                            ) """
 
     accelerator.end_training()
 

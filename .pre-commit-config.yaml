@@ -4,13 +4,24 @@ repos:
     hooks:
       - id: check-yaml # or other general-purpose hooks you want to use
 
-  - repo: https://github.com/pycqa/flake8
-    rev: '6.1.0' # or the version you want to use
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
     hooks:
-      - id: flake8
+      - id: isort
+        name: isort (python)
+      - id: isort
+        name: isort (cython)
+        types: [cython]
+      - id: isort
+        name: isort (pyi)
+        types: [pyi]
 
   - repo: https://github.com/psf/black
     rev: '23.3.0' # or the version you want to use
     hooks:
       - id: black
-        args: ['--check']
+
+  - repo: https://github.com/pycqa/flake8
+    rev: '6.1.0' # or the version you want to use
+    hooks:
+      - id: flake8

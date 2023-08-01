@@ -18,14 +18,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 black
+          pip install flake8 black isort
+
+      - name: Check imports using isort
+        run: |
+          isort . --check --profile black
 
       - name: Linting and Formatting
         run: |
           # Stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # Check for style guide compliance
-          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+          flake8 . --count --max-complexity=10 --max-line-length=88 --statistics
           # Check formatting using black
           black --check .
 

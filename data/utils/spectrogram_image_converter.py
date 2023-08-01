@@ -1,10 +1,9 @@
 import numpy as np
 import pydub
 from PIL import Image
-
-from utils.spectrogram_converter import *
-from utils.spectrogram_params import *
 from utils.riff_util import image_util
+from utils.spectrogram_converter import SpectrogramConverter
+from utils.spectrogram_params import SpectrogramParams
 
 
 class SpectrogramImageConverter:

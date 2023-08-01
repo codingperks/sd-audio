@@ -20,9 +20,11 @@ import math
 import os
 import random
 import shutil
+import sys
 from pathlib import Path
 
 import datasets
+import diffusers
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -33,13 +35,6 @@ from accelerate import Accelerator
 from accelerate.logging import get_logger
 from accelerate.utils import ProjectConfiguration, set_seed
 from datasets import load_dataset
-from huggingface_hub import create_repo, upload_folder
-from packaging import version
-from torchvision import transforms
-from tqdm.auto import tqdm
-from transformers import CLIPTextModel, CLIPTokenizer
-
-import diffusers
 from diffusers import (
     AutoencoderKL,
     DDPMScheduler,
@@ -51,19 +46,16 @@ from diffusers.models.attention_processor import LoRAAttnProcessor
 from diffusers.optimization import get_scheduler
 from diffusers.utils import check_min_version, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
-
-import sys
+from huggingface_hub import create_repo, upload_folder
+from packaging import version
+from torchvision import transforms
+from tqdm.auto import tqdm
+from transformers import CLIPTextModel, CLIPTokenizer
 
 sys.path.append("../../../data")
 from AudioSet.data_pipeline import WavPreprocessor
-from utils.spectrogram_params import SpectrogramParams
-from utils.spectrogram_image_converter import SpectrogramImageConverter
-import typing as T
-from torchvision.utils import make_grid
-from PIL import Image
 from torchvision.transforms.functional import to_pil_image
-import soundfile as sf
-
+from utils.spectrogram_params import SpectrogramParams
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.18.0.dev0")
@@ -103,13 +95,13 @@ These are LoRA adaption weights for {base_model}. The weights were fine-tuned on
 
 # to do - add this to full robust pipeline
 spec_params = SpectrogramParams(
-        sample_rate=44100,
-        stereo=False,
-        step_size_ms=(10 / 512) * 1000,
-        min_frequency=20,
-        max_frequency=20000,
-        num_frequencies=512,
-    )
+    sample_rate=44100,
+    stereo=False,
+    step_size_ms=(10 / 512) * 1000,
+    min_frequency=20,
+    max_frequency=20000,
+    num_frequencies=512,
+)
 preprocessor = WavPreprocessor(spec_params)
 
 
@@ -970,15 +962,14 @@ def main():
     )
     progress_bar.set_description("Steps")
 
+    min_val = 99999999  # used for checkpointing
+
     for epoch in range(first_epoch, args.num_train_epochs):
         logger.info(f"Starting epoch {epoch}")
 
         # TRAINING LOOP
         unet.train()
         train_loss = 0.0
-        train_images_log = []
-        train_audio_log = []
-        train_images_audio_log = []
 
         for step, batch in enumerate(train_dataloader):
             # Skip steps until we reach the resumed step
@@ -1000,7 +991,7 @@ def main():
                 audio_data = audio_data.mean(dim=0)
             else:
                 audio_data = audio_data
-   
+
             # Log the batch of training images and audio every 10 epochs
             if epoch == 0 or epoch % 10 == 0:
                 # Collect data to log after loop
@@ -1138,8 +1129,6 @@ def main():
                 # if accelerator.sync_gradients:
                 progress_bar.update(1)
                 global_step += 1
-                # accelerator.log({"train_loss": train_loss}, step=global_step)
-                # train_loss = 0.0
 
                 if global_step % args.checkpointing_steps == 0:
                     if accelerator.is_main_process:
@@ -1238,8 +1227,6 @@ def main():
                 )
 
                 with torch.no_grad():  # disable gradient calculation
-                    # wandb.log({"val_input/validation_images_audio (LOSSY)": [wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"Step {step}")]}, commit=False)
-
                     latents = vae.encode(
                         batch["pixel_values"].to(dtype=weight_dtype)
                     ).latent_dist.sample()
@@ -1310,8 +1297,6 @@ def main():
                     )
                     logger.info(f"Cumulative validation average loss is {valid_loss}")
 
-                    # accelerator.log({"val_step_loss": avg_val_loss_per_step}, step=global_step) # log the per-step average validation loss
-
             # At the end of each epoch, randomly select one sample to log
             random_index = torch.randint(high=len(val_images_log), size=(1,)).item()
 
@@ -1336,6 +1321,15 @@ def main():
             accelerator.log(
                 {"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch}, step=global_step
             )  # log the average validation loss per epoch
+
+            # Save best performing checkpoint
+            if avg_valid_loss_per_epoch < min_val:
+                min_val = avg_valid_loss_per_epoch
+                save_path = os.path.join(
+                    args.output_dir, f"checkpoint-{global_step}-best"
+                )
+
+                accelerator.save_state(save_path)
 
         if global_step >= args.max_train_steps:
             break
@@ -1400,32 +1394,19 @@ def main():
 
                 wandb.log(
                     {
-                        f"val_inf/validation_inference_image": image_logs,
-                        f"val_inf/validation_inference_audio": audio_logs,
+                        "val_inf/validation_inference_image": image_logs,
+                        "val_inf/validation_inference_audio": audio_logs,
                     },
                     commit=False,
                 )
 
-                """                 for tracker in accelerator.trackers:
-                                    if tracker.name == "tensorboard":
-                                        np_images = np.stack([np.asarray(img) for img in images])
-                                        tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
-                                    if tracker.name == "wandb":
-                                        tracker.log(
-                                            {
-                                                "val_inf/validation_inference_image": [
-                                                    wandb.Image(image, caption=f"{i}: {args.validation_prompt}", commit=False)
-                                                    for i, image in enumerate(images)
-                                                ],
-                                                "val_inf/validation_inference_audio": [
-                                                    wandb.Audio(image_to_audio(image), sample_rate = 44100, caption=f"{i}: {args.validation_prompt}", commit=False)
-                                                    for i, image in enumerate(images)
-                                                ]
-                                            }
-                                        ) """
-
                 del pipeline
                 torch.cuda.empty_cache()
+
+    # Save final model
+    save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}-final")
+
+    accelerator.save_state(save_path)
 
     # Save the lora layers
     accelerator.wait_for_everyone()
@@ -1489,20 +1470,6 @@ def main():
                 ],
             }
         )
-        """         for tracker in accelerator.trackers:
-                    if len(images) != 0:
-                        if tracker.name == "tensorboard":
-                            np_images = np.stack([np.asarray(img) for img in images])
-                            tracker.writer.add_images("test", np_images, epoch, dataformats="NHWC")
-                        if tracker.name == "wandb":
-                            tracker.log(
-                                {
-                                    "test/test": [
-                                        wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
-                                        for i, image in enumerate(images)
-                                    ]
-                                }
-                            ) """
 
     accelerator.end_training()
 

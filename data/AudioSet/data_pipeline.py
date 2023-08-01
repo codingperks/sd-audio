@@ -1,19 +1,17 @@
+import csv
+import math
 import os
-import librosa
-import soundfile as sf
-import numpy as np
+import random
+import shutil
 import sys
+
+import librosa
+import numpy as np
+import pydub
+import soundfile as sf
 
 sys.path.append("..")
 from utils.spectrogram_image_converter import SpectrogramImageConverter
-from utils.spectrogram_params import SpectrogramParams
-import pydub
-import typing as T
-from PIL import Image
-import shutil
-import csv
-import random
-import math
 
 
 class WavPreprocessor:
@@ -31,7 +29,7 @@ class WavPreprocessor:
         y_resampled = librosa.resample(y=y, orig_sr=sr, target_sr=target_sr)
 
         return y_resampled, target_sr
-    
+
     def resample_folder(self, input_path, target_sr):
         for filename in os.listdir(input_path):
             if filename.endswith(".wav"):
@@ -98,7 +96,6 @@ class WavPreprocessor:
 
         # Generate the spectrogram
         image = self._converter.spectrogram_image_from_audio(segment)
-
 
         # Crop width to 512
         image = image.crop((0, 0, 512, 512))

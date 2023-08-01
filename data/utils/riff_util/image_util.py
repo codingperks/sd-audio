@@ -6,7 +6,6 @@ import typing as T
 
 import numpy as np
 from PIL import Image
-
 from utils.spectrogram_params import SpectrogramParams
 
 

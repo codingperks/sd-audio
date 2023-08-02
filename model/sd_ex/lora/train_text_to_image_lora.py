@@ -1323,7 +1323,7 @@ def main():
             )  # log the average validation loss per epoch
 
             # Save best performing checkpoint
-            if avg_valid_loss_per_epoch < min_val:
+            if avg_valid_loss_per_epoch <= min_val:
                 min_val = avg_valid_loss_per_epoch
                 save_path = os.path.join(
                     args.output_dir, f"checkpoint-{global_step}-best"

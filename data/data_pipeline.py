@@ -3,15 +3,13 @@ import math
 import os
 import random
 import shutil
-import sys
 
 import librosa
 import numpy as np
 import pydub
 import soundfile as sf
 
-sys.path.append("..")
-from utils.spectrogram_image_converter import SpectrogramImageConverter
+from data.utils.spectrogram_image_converter import SpectrogramImageConverter
 
 
 class WavPreprocessor:
@@ -20,8 +18,6 @@ class WavPreprocessor:
         self._converter = SpectrogramImageConverter(
             params=spectrogram_params, device="cuda"
         )
-
-        return
 
     def resample(self, audio, target_sr):
         y, sr = librosa.load(audio, sr=None)

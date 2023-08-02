@@ -3,8 +3,7 @@
 
 
 class Pipeline:
-    def __init__(self, processor, model):
-        self._processor = processor
+    def __init__(self, model):
         self._model = model
 
     def set_dirs(self, data_dir, checkpoint_dir, inf_dir):

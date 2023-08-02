@@ -14,6 +14,7 @@
 # limitations under the License.
 """Fine-tuning script for Stable Diffusion for text2image with support for LoRA."""
 
+import json
 import logging
 import math
 import os
@@ -72,7 +73,7 @@ class Sd_model_lora:
         val_data_dir: str = None,
         image_column: str = "image",
         caption_column: str = "text",
-        validation_prompts: str = None,
+        validation_prompts: list[str] = None,
         num_validation_images: int = 4,
         validation_epochs: int = 1,
         max_train_samples: int = None,
@@ -174,20 +175,20 @@ class Sd_model_lora:
         """
 
         self._preprocessor = preprocessor
-        self._pretrained_path = pretrained_model_name_or_path
+        self._pretrained_model_name_or_path = pretrained_model_name_or_path
         self._seed = seed
         self._num_train_epochs = num_train_epochs
         self._max_train_steps = max_train_steps
         self._revision = revision
         self._dataset_name = dataset_name
         self._dataset_config = dataset_config_name
-        self._image_col = image_column
-        self._caption_col = caption_column
+        self._image_column = image_column
+        self._caption_column = caption_column
         self._val_prompts = validation_prompts
-        self._num_val_images = num_validation_images
-        self._train_dataset = train_data_dir
-        self._val_dataset = val_data_dir
-        self._val_epochs = validation_epochs
+        self._num_validation_images = num_validation_images
+        self._train_data_dir = train_data_dir
+        self._val_data_dir = val_data_dir
+        self._validation_epochs = validation_epochs
         self._max_train_samples = max_train_samples
         self._max_val_samples = max_val_samples
         self._output_dir = output_dir
@@ -197,8 +198,8 @@ class Sd_model_lora:
         self._random_flip = random_flip
         self._train_batch_size = train_batch_size
         self._val_batch_size = val_batch_size
-        self._grad_accumulation_steps = gradient_accumulation_steps
-        self._grad_checkpointing = gradient_checkpointing
+        self._gradient_accumulation_steps = gradient_accumulation_steps
+        self._gradient_checkpointing = gradient_checkpointing
         self._learning_rate = learning_rate
         self._scale_lr = scale_lr
         self._lr_scheduler = lr_scheduler
@@ -227,6 +228,12 @@ class Sd_model_lora:
             enable_xformers_memory_efficient_attention
         )
         self._noise_offset = noise_offset
+        self._config = {
+            key[1:]: value
+            for key, value in vars(self).items()
+            if key.startswith("_") and key != "_preprocessor"
+        }
+        self._config["val_prompts"] = json.dumps(self._val_prompts)
 
     def save_model_card(
         self,
@@ -267,7 +274,6 @@ class Sd_model_lora:
             "dataset": ("image", "text", "audiofile"),
         }
 
-        args = self.parse_args()
         logging_dir = Path(self._output_dir, self._logging_dir)
 
         accelerator_project_config = ProjectConfiguration(
@@ -540,7 +546,7 @@ class Sd_model_lora:
 
         # Preprocessing the datasets.
         # We need to tokenize input captions and transform the images.
-        def tokenize_captions(self, examples, is_train=True):
+        def tokenize_captions(examples, is_train=True):
             captions = []
             for caption in examples[caption_column]:
                 if isinstance(caption, str):
@@ -579,7 +585,7 @@ class Sd_model_lora:
             ]
         )
 
-        def preprocess_train(self, examples):
+        def preprocess_train(examples):
             images = [image.convert("RGB") for image in examples[image_column]]
             examples["pixel_values"] = [train_transforms(image) for image in images]
             examples["input_ids"] = tokenize_captions(examples)
@@ -595,7 +601,7 @@ class Sd_model_lora:
 
             return examples
 
-        def preprocess_val(self, examples):
+        def preprocess_val(examples):
             images = [image.convert("RGB") for image in examples[image_column]]
             examples["pixel_values"] = [train_transforms(image) for image in images]
             examples["input_ids"] = tokenize_captions(examples, is_train=False)
@@ -705,7 +711,7 @@ class Sd_model_lora:
         # We need to initialize the trackers we use, and also store our configuration.
         # The trackers initializes automatically on the main process.
         if accelerator.is_main_process:
-            accelerator.init_trackers("sd_speech", config=vars(args))
+            accelerator.init_trackers("sd_speech", config=(self._config))
 
         # Train!
         total_batch_size = (
@@ -1171,19 +1177,12 @@ class Sd_model_lora:
                     if self._seed is not None:
                         generator = generator.manual_seed(self._seed)
 
-                    validation_prompts = [
-                        self._validation_prompt,
-                        self._validation_prompt2,
-                        self._validation_prompt3,
-                        self._validation_prompt4,
-                        self._validation_prompt5,
-                    ]
                     images = []
                     audios = []
                     image_prompts = []
                     audio_prompts = []
 
-                    for prompt in validation_prompts:
+                    for prompt in self._validation_prompts:
                         for _ in range(self._num_validation_images):
                             img = pipeline(
                                 prompt, num_inference_steps=30, generator=generator

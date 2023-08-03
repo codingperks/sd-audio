@@ -184,7 +184,7 @@ class Sd_model_lora:
         self._dataset_config = dataset_config_name
         self._image_column = image_column
         self._caption_column = caption_column
-        self.validation_prompts = validation_prompts
+        self._validation_prompts = validation_prompts
         self._num_validation_images = num_validation_images
         self._train_data_dir = train_data_dir
         self._val_data_dir = val_data_dir
@@ -233,7 +233,7 @@ class Sd_model_lora:
             for key, value in vars(self).items()
             if key.startswith("_") and key != "_preprocessor"
         }
-        self._config["val_prompts"] = json.dumps(self._val_prompts)
+        self._config["validation_prompts"] = json.dumps(self._validation_prompts)
 
     def save_model_card(
         self,

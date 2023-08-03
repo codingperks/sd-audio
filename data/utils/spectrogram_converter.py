@@ -4,8 +4,9 @@ import numpy as np
 import pydub
 import torch
 import torchaudio
-from utils.riff_util import audio_util, torch_util
-from utils.spectrogram_params import SpectrogramParams
+
+from data.utils.riff_util import audio_util, torch_util
+from data.utils.spectrogram_params import SpectrogramParams
 
 
 class SpectrogramConverter:

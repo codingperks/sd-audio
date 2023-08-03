@@ -184,7 +184,7 @@ class Sd_model_lora:
         self._dataset_config = dataset_config_name
         self._image_column = image_column
         self._caption_column = caption_column
-        self._val_prompts = validation_prompts
+        self.validation_prompts = validation_prompts
         self._num_validation_images = num_validation_images
         self._train_data_dir = train_data_dir
         self._val_data_dir = val_data_dir
@@ -1155,12 +1155,12 @@ class Sd_model_lora:
                 break
             if accelerator.is_main_process:
                 if (
-                    self._validation_prompt is not None
+                    self._validation_prompts is not None
                     and epoch % self._validation_epochs == 0
                 ):
                     logger.info(
-                        f"Running validation... \n Generating {self._num_validation_images} images with prompt:"
-                        f" {self._validation_prompt}."
+                        f"Running validation... \n Generating {self._num_validation_images} images for each prompt in:"
+                        f" {self._validation_prompts}."
                     )
                     # create pipeline
                     pipeline = DiffusionPipeline.from_pretrained(

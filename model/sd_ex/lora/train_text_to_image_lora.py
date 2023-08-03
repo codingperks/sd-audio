@@ -1258,29 +1258,35 @@ class Sd_model_lora:
         generator = torch.Generator(device=accelerator.device)
         if self._seed is not None:
             generator = generator.manual_seed(self._seed)
+
         images = []
-        for _ in range(self._num_validation_images):
-            images.append(
-                pipeline(
-                    self._validation_prompt, num_inference_steps=30, generator=generator
+        image_captions = []
+
+        for prompt in self._validation_prompts:
+            for _ in range(self._num_validation_images):
+                img = pipeline(
+                    prompt, num_inference_steps=30, generator=generator
                 ).images[0]
-            )
+                images.append(img)
+                image_captions.append(prompt)
 
         if accelerator.is_main_process:
+            image_logs = [
+                wandb.Image(image, caption=caption)
+                for image, caption in zip(images, image_captions)
+            ]
+            audio_logs = [
+                wandb.Audio(
+                    self._preprocessor.spec_to_wav_np(image),
+                    sample_rate=44100,
+                    caption=caption,
+                )
+                for image, caption in zip(images, image_captions)
+            ]
             wandb.log(
                 {
-                    "test/test_image": [
-                        wandb.Image(image, caption=f"{i}: {self._validation_prompt}")
-                        for i, image in enumerate(images)
-                    ],
-                    "test/test_audio": [
-                        wandb.Audio(
-                            self._preprocessor.spec_to_wav_np(image),
-                            sample_rate=44100,
-                            caption=f"{i}: {self._validation_prompt}",
-                        )
-                        for i, image in enumerate(images)
-                    ],
+                    "test/test_image": image_logs,
+                    "test/test_audio": audio_logs,
                 }
             )
 

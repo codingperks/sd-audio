@@ -5,7 +5,6 @@ from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
 
 if __name__ == "__main__":
     # Prepare data
-    # add when needed
 
     # Create processor
     params = SpectrogramParams(

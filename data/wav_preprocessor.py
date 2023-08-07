@@ -9,6 +9,10 @@ from data.utils.spectrogram_image_converter import SpectrogramImageConverter
 
 
 class WavPreprocessor:
+    """
+    Preprocessor object for processing wav files: resampling, normalising, padding and converting to spec
+    """
+
     def __init__(self, spectrogram_params):
         self._params = spectrogram_params
         self._converter = SpectrogramImageConverter(

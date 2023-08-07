@@ -3,6 +3,10 @@ import os
 
 
 class ACPipeline:
+    """
+    Pipeline for processing audiocaps data - applying preprocessing steps + generating metadata.csv
+    """
+
     def __init__(self, dataset_path, preprocessor):
         self._dataset_path = dataset_path  # Where data is saved and constructed
         self._preprocessor = preprocessor

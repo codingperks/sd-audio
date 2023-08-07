@@ -6,7 +6,11 @@ import shutil
 
 
 # Select chosen classes and copy across into data folder
-class DatasetPipeline:
+class ASPipeline:
+    """
+    Pipeline for processing Audioset data - applying preprocessing steps, combining and splitting folders, generating metadata
+    """
+
     def __init__(self, dataset_path, class_path, preprocessor, *classes):
         self._dataset_path = dataset_path  # Where dataset will be constructed
         self._class_path = class_path  # Where raw data is saved

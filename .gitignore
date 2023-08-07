@@ -20,3 +20,6 @@ checkpoint-*
 *.bin
 *.ckpt
 
+# archive folders
+archive/
+

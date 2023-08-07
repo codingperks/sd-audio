@@ -1,4 +1,3 @@
-import os
 import shutil
 from datetime import date
 
@@ -40,9 +39,6 @@ if __name__ == "__main__":
     config["output_dir"] += date + "/" + lr + "_" + steps + "steps_" + warmup + "warmup"
     config_dir = config["output_dir"].replace(".", "")
 
-    if not os.path.exists(config_dir):
-        os.makedirs(config_dir)
-
     if lr != "":
         config["learning_rate"] = float(lr)
     if steps != "":
@@ -57,8 +53,8 @@ if __name__ == "__main__":
     # Create model
     model = Sd_model_lora(preprocessor=processor, **config)
 
-    # Save config in output folder
-    shutil.copy("config/json/config.json", config["output_dir"])
-
     # train model
     model.train()
+
+    # Save config in output folder
+    shutil.copy("config/json/config.json", config["output_dir"])

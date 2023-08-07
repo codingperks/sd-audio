@@ -271,7 +271,7 @@ class Sd_model_lora:
 
     def train(self):
         DATASET_NAME_MAPPING = {
-            "dataset": ("image", "text", "audiofile"),
+            "dataset": ("image", "text", "audio"),
         }
 
         logging_dir = Path(self._output_dir, self._logging_dir)

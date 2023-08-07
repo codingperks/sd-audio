@@ -1,4 +1,4 @@
-image,caption,audio
+file_name,text,audiofile
 r1nicOVtvkQ.png,a spectrogram of A woman talks nearby as water pours,./data/audiocaps/dataset/train/r1nicOVtvkQ.wav
 UDGBjjwyaqE.png,a spectrogram of Multiple clanging and clanking sounds,./data/audiocaps/dataset/train/UDGBjjwyaqE.wav
 3eJ9RynJzP8.png,"a spectrogram of The wind is blowing, insects are singing, and rustling occurs",./data/audiocaps/dataset/train/3eJ9RynJzP8.wav

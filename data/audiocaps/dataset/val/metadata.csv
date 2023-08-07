@@ -1,4 +1,4 @@
-image,caption,audio
+file_name,text,audiofile
 vfY_TJq7n_U.png,"a spectrogram of Rustling occurs, ducks quack and water splashes, followed by an adult female and adult male speaking and duck calls being blown",./data/audiocaps/dataset/val/vfY_TJq7n_U.wav
 tdWhHV3X25Q.png,a spectrogram of An audience gives applause as a man yells and a group sings,./data/audiocaps/dataset/val/tdWhHV3X25Q.wav
 tw76HGONaKg.png,a spectrogram of A man speaks over intermittent keyboard taps,./data/audiocaps/dataset/val/tw76HGONaKg.wav

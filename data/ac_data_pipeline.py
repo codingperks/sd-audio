@@ -34,7 +34,7 @@ class ACPipeline:
             metadata, "w", newline=""
         ) as outfile:
             reader = csv.DictReader(infile)
-            fieldnames = ["image", "caption", "audio"]
+            fieldnames = ["file_name", "text", "audiofile"]
             writer = csv.DictWriter(outfile, fieldnames=fieldnames)
 
             writer.writeheader()

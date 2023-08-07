@@ -1,4 +1,4 @@
-image,caption,audio
+file_name,text,audiofile
 6BJ455B1aAs.png,a spectrogram of A rocket flies by followed by a loud explosion and fire crackling as a truck engine runs idle,./data/audiocaps/dataset/test/6BJ455B1aAs.wav
 GOD8Bt5LfDE.png,a spectrogram of Humming and vibrating with a man and children speaking and laughing,./data/audiocaps/dataset/test/GOD8Bt5LfDE.wav
 YQSuFyFm3Lc.png,a spectrogram of A train running on a railroad track followed by a vehicle door closing and a man talking in the distance while a train horn honks and railroad crossing warning signals ring,./data/audiocaps/dataset/test/YQSuFyFm3Lc.wav

@@ -43,7 +43,7 @@ class ACPipeline:
                     writer.writerow(
                         {
                             "image": f"{youtube_id}.png",
-                            "caption": row["caption"],
+                            "caption": "a spectrogram of " + row["caption"],
                             "audio": wav_file,
                         }
                     )

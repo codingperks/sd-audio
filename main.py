@@ -1,10 +1,10 @@
+import os
 import shutil
 from datetime import date
 
 from config.config import parse_json
+from data.ac_data_pipeline import ACPipeline
 from data.utils.spectrogram_params import SpectrogramParams
-
-# from data.ac_data_pipeline import ACPipeline
 from data.wav_preprocessor import WavPreprocessor
 from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
 
@@ -21,8 +21,14 @@ if __name__ == "__main__":
     processor = WavPreprocessor(spectrogram_params=params)
 
     # Prepare data - uncomment if needed
-    # pipeline = ACPipeline("./data/audiocaps/dataset", processor)
-    # pipeline.create_dataset(44100)
+    pipeline = ACPipeline("./data/audiocaps/dataset", processor)
+    """     pipeline.generate_metadata(
+            "train", "data/audiocaps/dataset/train_download_success.csv"
+        )
+    pipeline.generate_metadata(
+        "test", "data/audiocaps/dataset/test_download_success.csv"
+    )
+    pipeline.generate_metadata("val", "data/audiocaps/dataset/val_download_success.csv") """
 
     # Parse JSON parameters
     config = parse_json("config/json/config.json")
@@ -37,6 +43,7 @@ if __name__ == "__main__":
     today = date.today()
     date = today.strftime("%m-%d")
     config["output_dir"] += date + "/" + lr + "_" + steps + "steps_" + warmup + "warmup"
+    os.mkdir(config["output_dir"])
 
     if lr != "":
         config["learning_rate"] = float(lr)

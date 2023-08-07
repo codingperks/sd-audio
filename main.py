@@ -2,6 +2,9 @@ import shutil
 from datetime import date
 
 from config.config import parse_json
+
+from data.audiocaps.ac_pipeline import ACPipeline
+from data.data_pipeline import WavPreprocessor
 from data.utils.spectrogram_params import SpectrogramParams
 
 # from data.ac_data_pipeline import ACPipeline

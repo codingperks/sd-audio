@@ -10,6 +10,7 @@ ColossalAI
 *.zip
 *.tar.*
 *.mp3
+*.zip
 
 # Weights and Biases
 wandb
@@ -18,4 +19,7 @@ wandb
 checkpoint-*
 *.bin
 *.ckpt
+
+# archive folders
+archive/
 

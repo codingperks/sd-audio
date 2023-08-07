@@ -1,61 +1,15 @@
-#from config.config import parse_json
-#from data.data_pipeline import WavPreprocessor
-#from data.utils.spectrogram_params import SpectrogramParams
-#from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
-from data.audiocaps.downloader import download_audiocaps
-import os
+import shutil
+from datetime import date
+
+from config.config import parse_json
+
+# from data.ac_data_pipeline import ACPipeline
+from data.utils.spectrogram_params import SpectrogramParams
+from data.wav_preprocessor import WavPreprocessor
+from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
 
 if __name__ == "__main__":
-    # Prepare data
-    # add when needed
-
-    """ 
-    path = 'data/audiocaps/dataset/train/'
-    files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    number_of_files = len(files)
-
-    print(f"There are {number_of_files} files in the train folder.")
-
-    path = 'data/audiocaps/dataset/test/'
-    files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    number_of_files = len(files)
-
-    print(f"There are {number_of_files} files in the test folder.")
-
-    path = 'data/audiocaps/dataset/val/'
-    files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    number_of_files = len(files)
-
-    print(f"There are {number_of_files} files in the val folder.") """
-
-    """      download_audiocaps(
-            '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/train.csv',
-            '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/train_download_success.csv',
-            '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/train_download_fail.csv',
-            '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/train',
-            0.1
-        ) """
-
-    # Validation dataset
-    download_audiocaps(
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/val.csv',
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/val_download_success.csv',
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/val_download_fail.csv',
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/val',
-        1.0
-    )
-
-    # Test dataset
-    download_audiocaps(
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/test.csv',
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/test_download_success.csv',
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/test_download_fail.csv',
-        '/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset/test',
-        1.0
-    )
-    
-    
-    """     # Create processor
+    # Create processor
     params = SpectrogramParams(
         sample_rate=44100,
         stereo=False,
@@ -66,12 +20,41 @@ if __name__ == "__main__":
     )
     processor = WavPreprocessor(spectrogram_params=params)
 
+    # Prepare data - uncomment if needed
+    # pipeline = ACPipeline("./data/audiocaps/dataset", processor)
+    # pipeline = ACPipeline.create_dataset()
+
     # Parse JSON parameters
     config = parse_json("config/json/config.json")
+
+    # CLI JSON Parsing
+    print("Select parameters")
+    lr = input("Learning rate: ")
+    steps = input("Training steps: ")
+    warmup = input("Warmup steps: ")
+
+    # Update config parameters
+    today = date.today()
+    date = today.strftime("%m-%d")
+    config["output_dir"] += date + "/" + lr + "_" + steps + "steps_" + warmup + "warmup"
+    config_dir = config["output_dir"].replace(".", "")
+
+    if lr != "":
+        config["learning_rate"] = float(lr)
+    if steps != "":
+        config["max_train_steps"] = int(steps)
+    if warmup != "":
+        config["lr_warmup_steps"] = int(warmup)
+
+    print(f"Learning rate:{config['learning_rate']}")
+    print(f"Training steps: {config['max_train_steps']}")
+    print(f"Warmup steps: {config['lr_warmup_steps']}")
 
     # Create model
     model = Sd_model_lora(preprocessor=processor, **config)
 
     # train model
     model.train()
-    """
+
+    # Save config in output folder
+    shutil.copy("config/json/config.json", config["output_dir"])

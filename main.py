@@ -38,9 +38,10 @@ if __name__ == "__main__":
     today = date.today()
     date = today.strftime("%m-%d")
     config["output_dir"] += date + "/" + lr + "_" + steps + "steps_" + warmup + "warmup"
+    config_dir = config["output_dir"].replace(".", "")
 
-    if not os.path.exists(config["output_dir"]):
-        os.mkdir(config["output_dir"])
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
 
     if lr != "":
         config["learning_rate"] = float(lr)

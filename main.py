@@ -1,9 +1,8 @@
-# from config.config import parse_json
+from config.config import parse_json
 from data.audiocaps.ac_pipeline import ACPipeline
 from data.data_pipeline import WavPreprocessor
 from data.utils.spectrogram_params import SpectrogramParams
-
-# from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
+from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
 
 if __name__ == "__main__":
     # Create processor
@@ -22,10 +21,10 @@ if __name__ == "__main__":
     pipeline.create_dataset(44100)
 
     # Parse JSON parameters
-    # config = parse_json("config/json/config.json")
+    config = parse_json("config/json/config.json")
 
     # Create model
-    # model = Sd_model_lora(preprocessor=processor, **config)
+    model = Sd_model_lora(preprocessor=processor, **config)
 
     # train model
-    # model.train()
+    model.train()

@@ -10,6 +10,7 @@ ColossalAI
 *.zip
 *.tar.*
 *.mp3
+*.zip
 
 # Weights and Biases
 wandb

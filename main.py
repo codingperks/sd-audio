@@ -1,3 +1,4 @@
+import argparse
 import shutil
 from datetime import date
 
@@ -27,24 +28,33 @@ if __name__ == "__main__":
     # Parse JSON parameters
     config = parse_json("config/json/config.json")
 
-    # CLI JSON Parsing
-    print("Select parameters")
-    lr = input("Learning rate: ")
-    steps = input("Training steps: ")
-    warmup = input("Warmup steps: ")
+    # Argparse setup
+    parser = argparse.ArgumentParser(
+        description="Train the model with custom parameters."
+    )
+    parser.add_argument(
+        "--lr", type=float, help="Learning rate", default=config["learning_rate"]
+    )
+    parser.add_argument(
+        "--steps", type=int, help="Training steps", default=config["max_train_steps"]
+    )
+    parser.add_argument(
+        "--warmup", type=int, help="Warmup steps", default=config["lr_warmup_steps"]
+    )
+
+    args = parser.parse_args()
 
     # Update config parameters
     today = date.today()
-    date = today.strftime("%m-%d")
-    config["output_dir"] += date + "/" + lr + "_" + steps + "steps_" + warmup + "warmup"
+    date_str = today.strftime("%m-%d")
+    config[
+        "output_dir"
+    ] += f"{date_str}/{args.lr}_{args.steps}steps_{args.warmup}warmup"
     config_dir = config["output_dir"].replace(".", "")
 
-    if lr != "":
-        config["learning_rate"] = float(lr)
-    if steps != "":
-        config["max_train_steps"] = int(steps)
-    if warmup != "":
-        config["lr_warmup_steps"] = int(warmup)
+    config["learning_rate"] = args.lr
+    config["max_train_steps"] = args.steps
+    config["lr_warmup_steps"] = args.warmup
 
     print(f"Learning rate:{config['learning_rate']}")
     print(f"Training steps: {config['max_train_steps']}")

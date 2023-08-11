@@ -988,6 +988,7 @@ class Sd_model_lora:
 
             # VALIDATION LOOP
             if epoch % self._validation_epochs == 0:
+                logger.info("Entering validation loop")
                 unet.eval()  # set model to evaluation mode
                 valid_loss = 0.0
                 val_images_log = []

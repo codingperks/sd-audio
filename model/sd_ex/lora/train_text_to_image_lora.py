@@ -797,34 +797,30 @@ class Sd_model_lora:
 
                 # Log a random training image and audio every epoch
                 if (epoch == 0) and step == 0:
-                    images_to_log = [
-                        wandb.Image(
-                            pixel_values[0], caption=f"Epoch {epoch} Step {step}"
-                        )
-                    ]
-                    audio_to_log = [
-                        wandb.Audio(
-                            audio_data[0].cpu().numpy(),
-                            sample_rate=44100,
-                            caption=f"Epoch {epoch} Step {step}",
-                        )
-                    ]
-                    images_audio_lossy_to_log = [
-                        wandb.Audio(
-                            self._preprocessor.spec_to_wav_np(
-                                to_pil_image(pixel_values[0])
-                            ),
-                            sample_rate=44100,
-                            caption=f"Epoch {epoch} Step {step}",
-                        )
-                    ]
+                    random_index = random.choice(range(len(pixel_values)))
+
+                    image_to_log = wandb.Image(
+                        pixel_values[random_index], caption=f"Epoch {epoch} Step {step}"
+                    )
+                    audio_to_log = wandb.Audio(
+                        audio_data[random_index].cpu().numpy(),
+                        sample_rate=44100,
+                        caption=f"Epoch {epoch} Step {step}",
+                    )
+                    image_audio_lossy_to_log = wandb.Audio(
+                        self._preprocessor.spec_to_wav_np(
+                            to_pil_image(pixel_values[random_index])
+                        ),
+                        sample_rate=44100,
+                        caption=f"Epoch {epoch} Step {step}",
+                    )
 
                     # Log everything at once
                     wandb.log(
                         {
-                            "train_input/training_images": images_to_log,
+                            "train_input/training_images": image_to_log,
                             "train_input/training_audio": audio_to_log,
-                            "train_input/training_images_audio (LOSSY)": images_audio_lossy_to_log,
+                            "train_input/training_images_audio (LOSSY)": image_audio_lossy_to_log,
                         },
                         commit=False,
                     )

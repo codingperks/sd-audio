@@ -24,3 +24,6 @@ lora/out/*
 # archive folders
 archive/
 
+# pycache folders
+__pycache__/*
+

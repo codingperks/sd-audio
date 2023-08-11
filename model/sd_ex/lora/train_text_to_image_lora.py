@@ -797,31 +797,26 @@ class Sd_model_lora:
 
                 # Log a random training image and audio every epoch
                 if (epoch == 0) and step == 0:
-                    random_indices = random.sample(range(len(pixel_values)))
-
                     images_to_log = [
                         wandb.Image(
-                            pixel_values[idx], caption=f"Epoch {epoch} Step {step}"
+                            pixel_values[0], caption=f"Epoch {epoch} Step {step}"
                         )
-                        for idx in random_indices
                     ]
                     audio_to_log = [
                         wandb.Audio(
-                            audio_data[idx].cpu().numpy(),
+                            audio_data[0].cpu().numpy(),
                             sample_rate=44100,
                             caption=f"Epoch {epoch} Step {step}",
                         )
-                        for idx in random_indices
                     ]
                     images_audio_lossy_to_log = [
                         wandb.Audio(
                             self._preprocessor.spec_to_wav_np(
-                                to_pil_image(pixel_values[idx])
+                                to_pil_image(pixel_values[0])
                             ),
                             sample_rate=44100,
                             caption=f"Epoch {epoch} Step {step}",
                         )
-                        for idx in random_indices
                     ]
 
                     # Log everything at once

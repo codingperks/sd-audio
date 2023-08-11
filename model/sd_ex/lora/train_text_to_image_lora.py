@@ -1116,6 +1116,11 @@ class Sd_model_lora:
                     val_dataloader
                 )  # calculate average validation loss per epoch
 
+                accelerator.log(
+                    {"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch},
+                    step=global_step,
+                )  # log the average validation loss per epoch
+
                 # Save best performing checkpoint
                 if avg_valid_loss_per_epoch <= min_val:
                     min_val = avg_valid_loss_per_epoch

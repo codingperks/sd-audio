@@ -19,6 +19,7 @@ wandb
 checkpoint-*
 *.bin
 *.ckpt
+lora/out/*
 
 # archive folders
 archive/

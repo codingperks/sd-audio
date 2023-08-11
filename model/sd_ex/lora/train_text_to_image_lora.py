@@ -796,7 +796,7 @@ class Sd_model_lora:
                     audio_data = audio_data.mean(dim=0)
 
                 # Log a random training image and audio every epoch
-                if (epoch == 0) and step == 0:
+                if step == 0:
                     random_index = random.choice(range(len(pixel_values)))
 
                     image_to_log = wandb.Image(

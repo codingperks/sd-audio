@@ -803,7 +803,7 @@ class Sd_model_lora:
                         pixel_values[random_index], caption=f"Epoch {epoch} Step {step}"
                     )
                     audio_to_log = wandb.Audio(
-                        audio_data[random_index].cpu().numpy(),
+                        audio_data.cpu().numpy(),  # Notice we removed the [random_index] here
                         sample_rate=44100,
                         caption=f"Epoch {epoch} Step {step}",
                     )

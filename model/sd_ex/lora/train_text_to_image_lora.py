@@ -791,43 +791,45 @@ class Sd_model_lora:
 
                 # logger.info(f"Starting training step {step}, global step {global_step}")
                 pixel_values = batch["pixel_values"]
-                image = to_pil_image(pixel_values[0])
-                audio_data = batch["audio"]
-                audio_data = audio_data.squeeze()
+                audio_data = batch["audio"].squeeze()
                 if audio_data.dim() > 1 and audio_data.shape[0] > 1:
                     audio_data = audio_data.mean(dim=0)
-                else:
-                    audio_data = audio_data
 
-                # Log the batch of training images and audio every 10 epochs
-                if epoch == 0 or epoch % 10 == 0:
-                    # Collect data to log after loop
+                # Log a random training image and audio every epoch
+                if (epoch == 0) and step == 0:
+                    random_indices = random.sample(range(len(pixel_values)))
+
+                    images_to_log = [
+                        wandb.Image(
+                            pixel_values[idx], caption=f"Epoch {epoch} Step {step}"
+                        )
+                        for idx in random_indices
+                    ]
+                    audio_to_log = [
+                        wandb.Audio(
+                            audio_data[idx].cpu().numpy(),
+                            sample_rate=44100,
+                            caption=f"Epoch {epoch} Step {step}",
+                        )
+                        for idx in random_indices
+                    ]
+                    images_audio_lossy_to_log = [
+                        wandb.Audio(
+                            self._preprocessor.spec_to_wav_np(
+                                to_pil_image(pixel_values[idx])
+                            ),
+                            sample_rate=44100,
+                            caption=f"Epoch {epoch} Step {step}",
+                        )
+                        for idx in random_indices
+                    ]
+
+                    # Log everything at once
                     wandb.log(
                         {
-                            "train_input/training_images": wandb.Image(
-                                batch["pixel_values"],
-                                caption=f"Epoch {epoch} Step {step}",
-                            )
-                        },
-                        commit=False,
-                    )
-                    wandb.log(
-                        {
-                            "train_input/training_audio": wandb.Audio(
-                                audio_data.cpu().numpy(),
-                                sample_rate=44100,
-                                caption=f"Epoch {epoch} Step {step}",
-                            )
-                        },
-                        commit=False,
-                    )
-                    wandb.log(
-                        {
-                            "train_input/training_images_audio (LOSSY)": wandb.Audio(
-                                self._preprocessor.spec_to_wav_np(image),
-                                sample_rate=44100,
-                                caption=f"Epoch {epoch} Step {step}",
-                            )
+                            "train_input/training_images": images_to_log,
+                            "train_input/training_audio": audio_to_log,
+                            "train_input/training_images_audio (LOSSY)": images_audio_lossy_to_log,
                         },
                         commit=False,
                     )

@@ -791,43 +791,36 @@ class Sd_model_lora:
 
                 # logger.info(f"Starting training step {step}, global step {global_step}")
                 pixel_values = batch["pixel_values"]
-                image = to_pil_image(pixel_values[0])
-                audio_data = batch["audio"]
-                audio_data = audio_data.squeeze()
+                audio_data = batch["audio"].squeeze()
                 if audio_data.dim() > 1 and audio_data.shape[0] > 1:
                     audio_data = audio_data.mean(dim=0)
-                else:
-                    audio_data = audio_data
 
-                # Log the batch of training images and audio every 10 epochs
-                if epoch == 0 or epoch % 10 == 0:
-                    # Collect data to log after loop
-                    wandb.log(
-                        {
-                            "train_input/training_images": wandb.Image(
-                                batch["pixel_values"],
-                                caption=f"Epoch {epoch} Step {step}",
-                            )
-                        },
-                        commit=False,
+                # Log a random training image and audio every epoch
+                if step == 0:
+                    random_index = random.choice(range(len(pixel_values)))
+
+                    image_to_log = wandb.Image(
+                        pixel_values[random_index], caption=f"Epoch {epoch} Step {step}"
                     )
-                    wandb.log(
-                        {
-                            "train_input/training_audio": wandb.Audio(
-                                audio_data.cpu().numpy(),
-                                sample_rate=44100,
-                                caption=f"Epoch {epoch} Step {step}",
-                            )
-                        },
-                        commit=False,
+                    audio_to_log = wandb.Audio(
+                        audio_data.cpu().numpy(),  # Notice we removed the [random_index] here
+                        sample_rate=44100,
+                        caption=f"Epoch {epoch} Step {step}",
                     )
+                    image_audio_lossy_to_log = wandb.Audio(
+                        self._preprocessor.spec_to_wav_np(
+                            to_pil_image(pixel_values[random_index])
+                        ),
+                        sample_rate=44100,
+                        caption=f"Epoch {epoch} Step {step}",
+                    )
+
+                    # Log everything at once
                     wandb.log(
                         {
-                            "train_input/training_images_audio (LOSSY)": wandb.Audio(
-                                self._preprocessor.spec_to_wav_np(image),
-                                sample_rate=44100,
-                                caption=f"Epoch {epoch} Step {step}",
-                            )
+                            "train_input/training_images": image_to_log,
+                            "train_input/training_audio": audio_to_log,
+                            "train_input/training_images_audio (LOSSY)": image_audio_lossy_to_log,
                         },
                         commit=False,
                     )
@@ -925,8 +918,6 @@ class Sd_model_lora:
                         {"training_step_loss": avg_loss_per_step}, step=global_step
                     )
 
-                    logger.info(f"train loss is {train_loss}")
-
                     # Backpropagate
                     accelerator.backward(loss)
                     if accelerator.sync_gradients:
@@ -997,6 +988,7 @@ class Sd_model_lora:
 
             # VALIDATION LOOP
             if epoch % self._validation_epochs == 0:
+                logger.info("Entering validation loop")
                 unet.eval()  # set model to evaluation mode
                 valid_loss = 0.0
                 val_images_log = []
@@ -1102,19 +1094,9 @@ class Sd_model_lora:
                         val_avg_loss = accelerator.gather(
                             val_loss.repeat(self._val_batch_size)
                         ).mean()
-                        avg_val_loss_per_step = (
-                            val_avg_loss.item()
-                        )  # calculate average loss per step
                         valid_loss += (
                             val_avg_loss.item()
                         )  # accumulate average loss over all steps
-
-                        logger.info(
-                            f"Per validation step average loss is {avg_val_loss_per_step}"
-                        )
-                        logger.info(
-                            f"Cumulative validation average loss is {valid_loss}"
-                        )
 
                 # At the end of each epoch, randomly select one sample to log
                 random_index = torch.randint(high=len(val_images_log), size=(1,)).item()
@@ -1134,9 +1116,7 @@ class Sd_model_lora:
                 avg_valid_loss_per_epoch = valid_loss / len(
                     val_dataloader
                 )  # calculate average validation loss per epoch
-                logger.info(
-                    f"Average validation loss for Epoch {epoch} is {avg_valid_loss_per_epoch}"
-                )
+
                 accelerator.log(
                     {"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch},
                     step=global_step,

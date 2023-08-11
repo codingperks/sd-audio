@@ -19,7 +19,10 @@ wandb
 checkpoint-*
 *.bin
 *.ckpt
+lora/out/*
 
 # archive folders
 archive/
 
+# pycache folders
+__pycache__/*

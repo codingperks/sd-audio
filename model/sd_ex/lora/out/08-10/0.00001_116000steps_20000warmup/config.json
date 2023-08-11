@@ -12,7 +12,7 @@
                             "a spectrogram of Someone is typing on a computer keyboard"],
     "num_validation_images": 4,
     "validation_epochs": 1,
-    "checkpointing_steps": 50000,
+    "checkpointing_steps": 10000,
 
     "seed": 42,
     "max_train_steps": 40000,

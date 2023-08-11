@@ -927,8 +927,6 @@ class Sd_model_lora:
                         {"training_step_loss": avg_loss_per_step}, step=global_step
                     )
 
-                    logger.info(f"train loss is {train_loss}")
-
                     # Backpropagate
                     accelerator.backward(loss)
                     if accelerator.sync_gradients:
@@ -1104,19 +1102,9 @@ class Sd_model_lora:
                         val_avg_loss = accelerator.gather(
                             val_loss.repeat(self._val_batch_size)
                         ).mean()
-                        avg_val_loss_per_step = (
-                            val_avg_loss.item()
-                        )  # calculate average loss per step
                         valid_loss += (
                             val_avg_loss.item()
                         )  # accumulate average loss over all steps
-
-                        logger.info(
-                            f"Per validation step average loss is {avg_val_loss_per_step}"
-                        )
-                        logger.info(
-                            f"Cumulative validation average loss is {valid_loss}"
-                        )
 
                 # At the end of each epoch, randomly select one sample to log
                 random_index = torch.randint(high=len(val_images_log), size=(1,)).item()
@@ -1136,13 +1124,6 @@ class Sd_model_lora:
                 avg_valid_loss_per_epoch = valid_loss / len(
                     val_dataloader
                 )  # calculate average validation loss per epoch
-                logger.info(
-                    f"Average validation loss for Epoch {epoch} is {avg_valid_loss_per_epoch}"
-                )
-                accelerator.log(
-                    {"avg_valid_loss_per_epoch": avg_valid_loss_per_epoch},
-                    step=global_step,
-                )  # log the average validation loss per epoch
 
                 # Save best performing checkpoint
                 if avg_valid_loss_per_epoch <= min_val:

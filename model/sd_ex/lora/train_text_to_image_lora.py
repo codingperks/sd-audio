@@ -21,6 +21,7 @@ import os
 import random
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import datasets
@@ -234,6 +235,8 @@ class Sd_model_lora:
             if key.startswith("_") and key != "_preprocessor"
         }
         self._config["validation_prompts"] = json.dumps(self._validation_prompts)
+
+        print(f"temp folder is {tempfile.gettempdir()}")
 
     def save_model_card(
         self,
@@ -711,7 +714,11 @@ class Sd_model_lora:
         # We need to initialize the trackers we use, and also store our configuration.
         # The trackers initializes automatically on the main process.
         if accelerator.is_main_process:
-            accelerator.init_trackers("sd_speech", config=(self._config))
+            accelerator.init_trackers(
+                "sd_speech",
+                config=(self._config),
+                init_kwargs={"wandb": {"dir": f"{self._output_dir}"}},
+            )
 
         # Train!
         total_batch_size = (

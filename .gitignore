@@ -19,10 +19,11 @@ wandb
 checkpoint-*
 *.bin
 *.ckpt
-lora/out/*
+model/sd_ex/lora/out/**/config.json
 
 # archive folders
 archive/
 
-# pycache folders
+# pycache folders and files
 __pycache__/*
+*.pyc

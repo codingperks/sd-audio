@@ -33,19 +33,24 @@ if __name__ == "__main__":
         description="Train the model with custom parameters."
     )
     parser.add_argument(
-        "--lr", type=float, help="Learning rate", default=config["learning_rate"]
+        "--lr", type=float, help="Learning rate", 
+        default=config["learning_rate"]
     )
     parser.add_argument(
-        "--steps", type=int, help="Training steps", default=config["max_train_steps"]
+        "--steps", type=int, help="Training steps", 
+        default=config["max_train_steps"]
     )
     parser.add_argument(
-        "--warmup", type=int, help="Warmup steps", default=config["lr_warmup_steps"]
+        "--warmup", type=int, help="Warmup steps", 
+        default=config["lr_warmup_steps"]
     )
     parser.add_argument(
-        "--adamw", type=int, help="Adam weight decay", default=config["adam_weight_decay"]
+        "--adamw", type=float, help="Adam weight decay", 
+        default=config["adam_weight_decay"]
     )
     parser.add_argument(
-        "--adam2", type=int, help="Adam b2", default=config["adam_beta2"]
+        "--adam2", type=float, help="Adam b2", 
+        default=config["adam_beta2"]
     )
 
     args = parser.parse_args()

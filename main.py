@@ -67,7 +67,7 @@ if __name__ == "__main__":
     config["max_train_steps"] = args.steps
     config["lr_warmup_steps"] = args.warmup
     
-     if args.adamw:
+    if args.adamw:
         config["adam_weight_decay"] = args.adamw
     if args.adam2:
         config["adam_beta2"] = args.adam2

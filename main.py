@@ -68,9 +68,9 @@ if __name__ == "__main__":
     config["lr_warmup_steps"] = args.warmup
     
      if args.adamw:
-        config["adam_weight_decay"] = args.lr
+        config["adam_weight_decay"] = args.adamw
     if args.adam2:
-        config["adam_beta2"] = args.lr
+        config["adam_beta2"] = args.adam2
 
     print(f"Learning rate:{config['learning_rate']}")
     print(f"Training steps: {config['max_train_steps']}")

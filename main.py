@@ -33,23 +33,23 @@ if __name__ == "__main__":
         description="Train the model with custom parameters."
     )
     parser.add_argument(
-        "--lr", type=float, help="Learning rate", 
+        "--lr", type=float, help="Learning rate",
         default=config["learning_rate"]
     )
     parser.add_argument(
-        "--steps", type=int, help="Training steps", 
+        "--steps", type=int, help="Training steps",
         default=config["max_train_steps"]
     )
     parser.add_argument(
-        "--warmup", type=int, help="Warmup steps", 
+        "--warmup", type=int, help="Warmup steps",
         default=config["lr_warmup_steps"]
     )
     parser.add_argument(
-        "--adamw", type=float, help="Adam weight decay", 
+        "--adamw", type=float, help="Adam weight decay",
         default=config["adam_weight_decay"]
     )
     parser.add_argument(
-        "--adam2", type=float, help="Adam b2", 
+        "--adam2", type=float, help="Adam b2",
         default=config["adam_beta2"]
     )
 
@@ -62,19 +62,18 @@ if __name__ == "__main__":
         "output_dir"
     ] += f"{date_str}/{args.lr}_{args.steps}steps_{args.warmup}warmup"
     config_dir = config["output_dir"].replace(".", "")
-
+    
     config["learning_rate"] = args.lr
     config["max_train_steps"] = args.steps
     config["lr_warmup_steps"] = args.warmup
     
-    if args.adamw:
+     if args.adamw:
         config["adam_weight_decay"] = args.lr
     if args.adam2:
         config["adam_beta2"] = args.lr
 
     print(f"Learning rate:{config['learning_rate']}")
     print(f"Training steps: {config['max_train_steps']}")
-    print(f"Warmup steps: {config['lr_warmup_steps']}")
     print(f"Warmup steps: {config['lr_warmup_steps']}")
     print(f"Adam weight decay: {config['adam_weight_decay']}")
     print(f"Adam beta 2: {config['adam_beta2']}")

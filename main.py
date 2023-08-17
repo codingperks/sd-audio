@@ -41,6 +41,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--warmup", type=int, help="Warmup steps", default=config["lr_warmup_steps"]
     )
+    parser.add_argument(
+        "--adamw", type=int, help="Adam weight decay", default=config["adam_weight_decay"]
+    )
+    parser.add_argument(
+        "--adam2", type=int, help="Adam b2", default=config["adam_beta2"]
+    )
 
     args = parser.parse_args()
 
@@ -55,10 +61,18 @@ if __name__ == "__main__":
     config["learning_rate"] = args.lr
     config["max_train_steps"] = args.steps
     config["lr_warmup_steps"] = args.warmup
+    
+    if args.adamw:
+        config["adam_weight_decay"] = args.lr
+    if args.adam2:
+        config["adam_beta2"] = args.lr
 
     print(f"Learning rate:{config['learning_rate']}")
     print(f"Training steps: {config['max_train_steps']}")
     print(f"Warmup steps: {config['lr_warmup_steps']}")
+    print(f"Warmup steps: {config['lr_warmup_steps']}")
+    print(f"Adam weight decay: {config['adam_weight_decay']}")
+    print(f"Adam beta 2: {config['adam_beta2']}")
 
     # Create model
     model = Sd_model_lora(preprocessor=processor, **config)

@@ -799,21 +799,26 @@ class Sd_model_lora:
                 # logger.info(f"Starting training step {step}, global step {global_step}")
                 pixel_values = batch["pixel_values"]
                 audio_data = batch["audio"].squeeze()
-                if audio_data.dim() > 1 and audio_data.shape[0] > 1:
-                    audio_data = audio_data.mean(dim=0)
+
+                # If audio_data is one-dimensional, add an extra dimension
+                if len(audio_data.shape) == 1:
+                    audio_data = audio_data.unsqueeze(0)
+
+                # if audio_data.dim() > 1 and audio_data.shape[0] > 1:
+                #    audio_data = audio_data.mean(dim=0)
 
                 # Log a random training image and audio every epoch
                 if step == 0:
                     random_index = random.choice(range(len(pixel_values)))
-
                     image_to_log = wandb.Image(
                         pixel_values[random_index], caption=f"Epoch {epoch} Step {step}"
                     )
                     audio_to_log = wandb.Audio(
-                        audio_data.cpu().numpy(),  # Notice we removed the [random_index] here
+                        audio_data[random_index].cpu().numpy(),
                         sample_rate=44100,
                         caption=f"Epoch {epoch} Step {step}",
                     )
+
                     image_audio_lossy_to_log = wandb.Audio(
                         self._preprocessor.spec_to_wav_np(
                             to_pil_image(pixel_values[random_index])
@@ -1007,25 +1012,30 @@ class Sd_model_lora:
 
                     # logger.info(f"Starting val step {step}, global step {global_step}")
                     pixel_values = batch["pixel_values"]
-                    image = to_pil_image(pixel_values[0])
+                    audio_data = batch[
+                        "audio"
+                    ].squeeze()  # Squeeze any singleton dimensions
 
-                    # Ensuring audio data has correct dimensions for logging
-                    audio_data = batch["audio"]
-                    audio_data = audio_data.squeeze()
-                    if audio_data.dim() > 1 and audio_data.shape[0] > 1:
-                        audio_data = audio_data.mean(dim=0)
-                    else:
-                        audio_data = audio_data
+                    if len(audio_data.shape) == 1:
+                        audio_data = audio_data.unsqueeze(0)
 
-                    # Log random validation data
+                    # Choose a random index from the current batch
+                    random_index = torch.randint(
+                        high=len(pixel_values), size=(1,)
+                    ).item()
+
+                    image = to_pil_image(pixel_values[random_index])
+                    current_audio = audio_data[random_index]
+
                     val_images_log.append(
                         wandb.Image(
-                            batch["pixel_values"], caption=f"Epoch {epoch} Step {step}"
+                            pixel_values[random_index],
+                            caption=f"Epoch {epoch} Step {step}",
                         )
                     )
                     val_audio_log.append(
                         wandb.Audio(
-                            audio_data.cpu().numpy(),
+                            current_audio.cpu().numpy(),
                             sample_rate=44100,
                             caption=f"Epoch {epoch} Step {step}",
                         )

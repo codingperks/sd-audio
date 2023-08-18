@@ -51,8 +51,8 @@ if __name__ == "__main__":
         "--adam2", type=float, help="Adam b2", default=config["adam_beta2"]
     )
     parser.add_argument(
-        "--batch_size",
-        type=float,
+        "--batch",
+        type=int,
         help="Train and val batch sizes",
         default=config["train_batch_size"],
     )
@@ -75,9 +75,9 @@ if __name__ == "__main__":
         config["adam_weight_decay"] = args.adamw
     if args.adam2:
         config["adam_beta2"] = args.adam2
-    if args.batch_size:
-        config["train_batch_size"] = args.batch_size
-        config["val_batch_size"] = args.batch_size
+    if args.batch:
+        config["train_batch_size"] = args.batch
+        config["val_batch_size"] = args.batch
 
     print(f"Learning rate:{config['learning_rate']}")
     print(f"Training steps: {config['max_train_steps']}")

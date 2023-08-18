@@ -13,8 +13,9 @@
                             "a spectrogram of A horn honking followed by a man laughing then talking and plastic clanking on a hard surface",
                             "a spectrogram of A dog barking",
                             "a spectrogram of A train horn",
-                            "a spectrogram of A hammer hitting a hard surface",
-                            "a spectrogram of A man laughing",
+                            "a spectrogram of bird song",
+                            "a spectrogram of birds chirping",
+                            "a spectrogram of a snare drum"
                         ],
     "num_validation_images": 4,
     "validation_epochs": 1,

@@ -72,10 +72,10 @@ class ACPipeline:
         self.generate_metadata(
             "train", "data/audiocaps/dataset_full/train_download_success.csv"
         )
-        """         self.generate_metadata(
+        self.generate_metadata(
             "test", "data/audiocaps/dataset/test_download_success.csv"
         )
-        self.generate_metadata("val", "data/audiocaps/dataset/val_download_success.csv") """
+        self.generate_metadata("val", "data/audiocaps/dataset/val_download_success.csv")
 
         # 3. Test conversion back
         """         os.makedirs(self._dataset_path + "/dataset/spec_to_wav_test", exist_ok=True)

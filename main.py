@@ -4,7 +4,7 @@ from datetime import date
 
 from config.config import parse_json
 
-#from data.ac_data_pipeline import ACPipeline
+# from data.ac_data_pipeline import ACPipeline
 from data.utils.spectrogram_params import SpectrogramParams
 from data.wav_preprocessor import WavPreprocessor
 from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # Prepare data - uncomment if needed
     # pipeline = ACPipeline("./data/audiocaps/dataset_full", processor)
     # pipeline.create_dataset(44100)
-    
+
     # Parse JSON parameters
     config = parse_json("config/json/config.json")
 

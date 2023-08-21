@@ -66,7 +66,7 @@ class ACPipeline:
 
     def create_dataset(self, target_sr):
         # 1. Apply preprocessing (resampling and min_max_norm) for each class and create spectrograms
-        #self.preprocess(target_sr)
+        self.preprocess(target_sr)
 
         # 2. Generate metadata for each class
         self.generate_metadata(

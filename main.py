@@ -22,8 +22,8 @@ if __name__ == "__main__":
     processor = WavPreprocessor(spectrogram_params=params)
 
     # Prepare data - uncomment if needed
-    # pipeline = ACPipeline("./data/audiocaps/dataset", processor)
-    # pipeline = ACPipeline.create_dataset()
+    # pipeline = ACPipeline("./data/audiocaps/dataset_full", processor)
+    # pipeline.create_dataset(44100)
 
     # Parse JSON parameters
     config = parse_json("config/json/config.json")

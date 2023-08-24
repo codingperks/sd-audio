@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # Prepare data - uncomment if needed
     # pipeline = ACPipeline("./data/audiocaps/dataset_full", processor)
     # pipeline.create_dataset(44100)
-
+    
     # Parse JSON parameters
     config = parse_json("config/json/config.json")
 
@@ -95,3 +95,4 @@ if __name__ == "__main__":
 
     # Save config in output folder
     shutil.copy("config/json/config.json", config["output_dir"])
+   

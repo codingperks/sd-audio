@@ -46,9 +46,9 @@ class ACPipeline:
                 if os.path.exists(wav_file):
                     writer.writerow(
                         {
-                            "image": f"{youtube_id}.png",
-                            "caption": "a spectrogram of " + row["caption"],
-                            "audio": wav_file,
+                            "file_name": f"{youtube_id}.png",
+                            "text": "a spectrogram of " + row["caption"],
+                            "audiofile": wav_file,
                         }
                     )
 
@@ -73,9 +73,11 @@ class ACPipeline:
             "train", "data/audiocaps/dataset_full/train_download_success.csv"
         )
         self.generate_metadata(
-            "test", "data/audiocaps/dataset/test_download_success.csv"
+            "test", "data/audiocaps/dataset_full/test_download_success.csv"
         )
-        self.generate_metadata("val", "data/audiocaps/dataset/val_download_success.csv")
+        self.generate_metadata(
+            "val", "data/audiocaps/dataset_full/val_download_success.csv"
+        )
 
         # 3. Test conversion back
         """         os.makedirs(self._dataset_path + "/dataset/spec_to_wav_test", exist_ok=True)

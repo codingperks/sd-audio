@@ -1,4 +1,4 @@
-image,caption,audio
+file_name,text,audiofile
 3eGXNIadwGk.png,a spectrogram of Person is whistling,./data/audiocaps/dataset_full/train/3eGXNIadwGk.wav
 3eHYGSux1Ps.png,"a spectrogram of A motorboat cruises along, and a man talks",./data/audiocaps/dataset_full/train/3eHYGSux1Ps.wav
 3eQYsDrfsTc.png,a spectrogram of Someone has a hiccup while typing,./data/audiocaps/dataset_full/train/3eQYsDrfsTc.wav

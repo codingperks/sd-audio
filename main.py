@@ -5,22 +5,12 @@ from datetime import date
 from config.config import parse_json
 
 # from data.ac_data_pipeline import ACPipeline
-from data.utils.metadata_trimmer import trim_metadata_captions
 from data.utils.spectrogram_params import SpectrogramParams
 from data.wav_preprocessor import WavPreprocessor
 from model.sd_ex.lora.train_text_to_image_lora import Sd_model_lora
 
 if __name__ == "__main__":
-    trim_metadata_captions("data/audiocaps/dataset_full/test/metadata.csv")
-    print("test done")
-    trim_metadata_captions("data/audiocaps/dataset_full/train/metadata.csv")
-    print("train done")
-    trim_metadata_captions("data/audiocaps/dataset_full/val/metadata.csv")
-    print("val done")
-
-   
-    
-    """     # Create processor
+    # Create processor
     params = SpectrogramParams(
         sample_rate=44100,
         stereo=False,
@@ -88,7 +78,7 @@ if __name__ == "__main__":
     if args.batch:
         config["train_batch_size"] = args.batch
         config["val_batch_size"] = args.batch
- 
+
     print(f"Learning rate:{config['learning_rate']}")
     print(f"Training steps: {config['max_train_steps']}")
     print(f"Warmup steps: {config['lr_warmup_steps']}")
@@ -104,4 +94,4 @@ if __name__ == "__main__":
     model.train()
 
     # Save config in output folder
-    shutil.copy("config/json/config.json", config["output_dir"]) """    
+    shutil.copy("config/json/config.json", config["output_dir"])

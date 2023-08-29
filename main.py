@@ -56,6 +56,9 @@ if __name__ == "__main__":
         help="Train and val batch sizes",
         default=config["train_batch_size"],
     )
+    parser.add_argument(
+        "--full", type=bool, help="True if using full dataset", default=False
+    )
 
     args = parser.parse_args()
 
@@ -78,6 +81,10 @@ if __name__ == "__main__":
     if args.batch:
         config["train_batch_size"] = args.batch
         config["val_batch_size"] = args.batch
+    if args.full:
+        config["train_data_dir"] = "./data/audiocaps/dataset_full/train"
+        config["val_data_dir"] = "./data/audiocaps/dataset_full/val"
+        print("Using full AC dataset")
 
     print(f"Learning rate:{config['learning_rate']}")
     print(f"Training steps: {config['max_train_steps']}")

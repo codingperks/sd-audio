@@ -1245,7 +1245,6 @@ class Sd_model_lora:
             self._pretrained_model_name_or_path,
             revision=self._revision,
             torch_dtype=weight_dtype,
-            safety_checker=lambda images, **kwargs: (images, False),
         )
         pipeline = pipeline.to(accelerator.device)
 

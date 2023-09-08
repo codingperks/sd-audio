@@ -42,6 +42,7 @@ def generate_test_set(model, prompts, output_folder):
 
         # Save the image
         image.save(os.path.join(output_folder, f"{youtube_id}.png"))
+        print(f"{youtube_id}.png saved!")
 
 
 def convert_test_to_audio(image_dir, output_dir):
@@ -58,9 +59,25 @@ def convert_test_to_audio(image_dir, output_dir):
 
     processor.spec_to_wav_folder(image_dir, output_dir)
 
+checkpoints = ["/vol/bitbucket/rp22/sdspeech/evaluation/model-checkpoints/5e4-75epochs-full/5e4-checkpoint-852142-final", 
+               "/vol/bitbucket/rp22/sdspeech/evaluation/model-checkpoints/7e4-75epochs-full/7e4-checkpoint-852142-final"]
 
-generate_test_set(
-    "/vol/bitbucket/rp22/sdspeech/model/sd_ex/lora/out/09-04/0.0007_832000steps_28000warmup/checkpoint-250000",
-    "test_captions.json",
-    "data/test/image",
-)
+for chkpt in checkpoints:
+    # Extract the desired folder name
+    folder_name = chkpt.split('/')[-2].split('-')[0]
+    
+    # Construct the output path
+    output_path = os.path.join("data/test", folder_name)
+    
+    generate_test_set(
+        chkpt,
+        "test_captions.json",
+        output_path,
+    )
+    
+    # Construct the audio output path
+    audio_output_path = os.path.join(image_output_path, "wav")
+
+    # Convert generated images to .wav
+    convert_test_to_audio(image_output_path, audio_output_path)
+

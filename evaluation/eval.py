@@ -1,11 +1,14 @@
-import torch
-from audioldm_eval.audioldm_eval-main import EvaluationHelper
+import json
 
-def evaluate(gen_dir, test_dir):
+import torch
+from audioldm_eval.audioldm_eval import EvaluationHelper
+
+
+def evaluate(gen_dir, test_dir, results_name):
     # GPU acceleration is preferred
     device = torch.device(f"cuda:{0}")
 
-    generation_result_path = gen_data
+    generation_result_path = gen_dir
     target_audio_path = test_dir
 
     # Initialize a helper instance
@@ -15,5 +18,10 @@ def evaluate(gen_dir, test_dir):
     metrics = evaluator.main(
         generation_result_path,
         target_audio_path,
-        limit_num=None # If you only intend to evaluate X (int) pairs of data, set limit_num=X
+        limit_num=None,  # If you only intend to evaluate X (int) pairs of data, set limit_num=X
     )
+
+    results_name += ".json"
+
+    with open(results_name, "w") as outfile:
+        json.dump(metrics, outfile)

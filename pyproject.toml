@@ -1,11 +1,14 @@
 [tool.black]
 exclude = '''
 (
-      /model/sd_ex/lora/out
-    | \.ipynb
+      model/sd_ex/lora/out
+    | .*\.ipynb
+    | evaluation/audio_ldm_eval-main/
+    | /home/runner/work/sd-audio/sd-audio/evaluation/audioldm_eval-main/
 )
 '''
 
 [tool.isort]
 profile = "black"
 line_length = 88
+skip = ["evaluation/audioldm_eval-main"]

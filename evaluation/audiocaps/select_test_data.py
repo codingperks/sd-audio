@@ -1,3 +1,7 @@
+"""
+Small script used to separate .wav files from our test directory (which contain .wav and .png files) into a separate directory for evaluation.
+"""
+
 import os
 import shutil
 

@@ -1,3 +1,8 @@
+"""
+Script which randomly samples one caption from each of the five captions given for each sample in AudioCaps test set.
+Outputs as .json file which is used for generating our test set.
+"""
+
 import json
 
 import pandas as pd

@@ -27,6 +27,7 @@ def download_audiocaps(index_csv, success_csv, failures_csv, output_dir, limit):
     total_rows = len(pd.read_csv(index_csv))
     target = total_rows * limit
 
+    # Set up csv to output successfully downloaded samples to
     if os.path.exists(success_csv):
         with open(success_csv, "r") as successfile:
             reader = csv.reader(successfile)
@@ -34,6 +35,7 @@ def download_audiocaps(index_csv, success_csv, failures_csv, output_dir, limit):
             for row in reader:
                 processed_ytids.add(row[1])
 
+    # Set up csv to output unsuccessfully downloaded samples to
     if os.path.exists(failures_csv):
         with open(failures_csv, "r") as failurefile:
             reader = csv.reader(failurefile)
@@ -41,6 +43,7 @@ def download_audiocaps(index_csv, success_csv, failures_csv, output_dir, limit):
             for row in reader:
                 processed_ytids.add(row[1])
 
+    # Open these two files to write to during download
     with open(index_csv, "r") as csvfile, open(
         failures_csv, "a", newline=""
     ) as failurefile, open(success_csv, "a", newline="") as successfile:
@@ -77,19 +80,19 @@ def download_audiocaps(index_csv, success_csv, failures_csv, output_dir, limit):
 
             print(f"using url {video_url}")
 
-            command_to_get_url = f"youtube-dl -4 -g -f bestaudio {video_url}"
-            print(f"audio_url {command_to_get_url}")
+            get_url = f"youtube-dl -4 -g -f bestaudio {video_url}"
+            print(f"audio_url {get_url}")
 
-            audio_url = subprocess.getoutput(command_to_get_url).strip()
+            audio_url = subprocess.getoutput(get_url).strip()
 
             if not audio_url:
                 failure_writer.writerow([audiocap_id, ytid, "URL retrieval failure"])
                 print(f"Failed to retrieve URL for video {ytid}")
                 continue
 
-            command_to_download_convert = f'ffmpeg -ss {start_seconds} -i "{audio_url}" -t {duration} -acodec pcm_s16le -ar 44100 {output_audio_file}'
+            download_and_convert = f'ffmpeg -ss {start_seconds} -i "{audio_url}" -t {duration} -acodec pcm_s16le -ar 44100 {output_audio_file}'
 
-            download_result = os.system(command_to_download_convert)
+            download_result = os.system(download_and_convert)
 
             if download_result != 0:
                 failure_writer.writerow(

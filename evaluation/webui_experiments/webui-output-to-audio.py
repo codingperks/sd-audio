@@ -1,5 +1,5 @@
 """
-Short script for converting spectrograms in webui-output folders to .wav
+File containing two functions for converting spectrograms in webui-output folders to .wav
 """
 import os
 import shutil
@@ -47,6 +47,10 @@ def convert_test_to_audio(image_file, output_dir):
 
 
 def process_folder_recursive(current_folder):
+    """
+    This function recursively converts all files within subfolders from .png to .wav
+    This is used to convert our inference outputs from web-ui experiments.
+    """
     # Create output folder in the current directory
     output_folder_path = os.path.join(current_folder, "wav_outputs")
     if not os.path.exists(output_folder_path):

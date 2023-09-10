@@ -26,3 +26,4 @@ Also contains .csv used to download data (including files failed to download) as
 Also contains model checkpoints, high-level experiment analysis and outputs & utility functions related to our experiments with Web UI. 
 Utility function convert_to_safetensors.py taken from [here](https://github.com/harrywang/finetune-sd/blob/main/convert-to-safetensors.py).
 4. **model**: Contains training script adapted from [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/text_to_image/train_text_to_image_lora.py).
+5. This folder contains main.py and train.sh, files used to run our training script. train.sh was created to appropriately set environment variables to avoid filling up potentially limited temporary files (pertinent for working on shared drives).

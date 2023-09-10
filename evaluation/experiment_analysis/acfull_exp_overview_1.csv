@@ -1,0 +1,7 @@
+,Name,Created,learning_rate,lr_warmup_steps,max_train_steps,adam_beta2,adam_weight_decay
+1,audiocaps-full-lora-sd1_5-lr3e4-25epochs+20%warmup,2023-08-21T22:30:54.000Z,0.0003,125000,752000,0.999,0.01
+5,audiocaps-full-lora-sd1_5-lr1e4-25epochs+20%warmup,2023-08-21T22:30:54.000Z,0.0001,125000,752000,0.999,0.01
+0,audiocaps-full-lora-sd1_5-lr3e3-25epochs+20%warmup,2023-08-21T22:30:54.000Z,0.003,125000,752000,0.999,0.01
+4,audiocaps-full-lora-sd1_5-lr7e4-25epochs+20%warmup,2023-08-21T22:31:51.000Z,0.0007,125000,752000,0.999,0.01
+3,audiocaps-full-lora-sd1_5-lr5e4-25epochs+20%warmup,2023-08-21T22:31:51.000Z,0.0005,125000,752000,0.999,0.01
+2,audiocaps-full-lora-sd1_5-lr1e3-25epochs+20%warmup,2023-08-22T13:20:45.000Z,0.001,125000,752000,0.999,0.01

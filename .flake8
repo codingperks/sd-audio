@@ -2,6 +2,7 @@
 max-line-length = 88
 exclude =
     model/sd_ex/lora/out
+    evaluation/audioldm_eval-main
 ignore = E501, E402, W503
 
 [black]

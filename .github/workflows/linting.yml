@@ -22,7 +22,7 @@ jobs:
 
       - name: Check imports using isort
         run: |
-          isort . --check --profile black
+          isort . --check --profile black --skip evaluation/audioldm_eval-main
 
       - name: Linting and Formatting
         run: |
@@ -31,6 +31,6 @@ jobs:
           # Check for style guide compliance
           flake8 . --count --max-line-length=88 --statistics
           # Check formatting using black
-          black --check .
+          black --check . --exclude evaluation/audioldm_eval-main
 
     

@@ -21,6 +21,7 @@ checkpoint-*
 *.bin
 *.ckpt
 model/sd_ex/lora/out/**/config.json
+model/sd_ex/lora/out/*
 
 # archive folders
 archive/

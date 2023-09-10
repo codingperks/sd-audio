@@ -16,8 +16,7 @@ Although our model did not surpass the current state-of-the-art, the insights em
 
 We conclude by addressing ethical considerations, including potential misuse and copyright concerns, emphasising the importance of responsible advancement in this domain.
 
-Audio samples illustrating our model's capabilities can be accessed [here](https://sites.google.com/view/
-diss-audio-outputs).
+Audio samples illustrating our model's capabilities can be accessed [here](https://sites.google.com/view/diss-audio-outputs).
 
 ## Overview of codebase
 1. **config**: Contains a .json file used to specify training parameters and one utility function used for parsing this file.

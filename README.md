@@ -23,7 +23,8 @@ Audio samples illustrating our model's capabilities can be accessed [here/link].
 ## Overview of codebase
 1. **config**: Contains a .json file used to specify training parameters and one utility function used for parsing this file.
 2. **data**: Contains functions used for downloading and preprocessing our data, including spectrogram conversion code taken from [Riffusion](https://github.com/riffusion/riffusion). 
-Also contains .csv used to download data as well as metadata files detailing datasets used.
+Also contains .csv used to download data (including files failed to download) as well as metadata files detailing samples used in our training.
 3. **evaluation**: Contains evaluation code taken from [AudioLDM](https://github.com/haoheliu/audioldm_eval/tree/main/audioldm_eval) used for metric generation and code for generating required test data needed for this evaluation.
-Also contains model checkpoints, high-level experiment analysis and outputs & utility functions related to our webui-experiments. Utility function convert_to_safetensors.py taken from [here](https://github.com/harrywang/finetune-sd/blob/main/convert-to-safetensors.py).
+Also contains model checkpoints, high-level experiment analysis and outputs & utility functions related to our experiments with Web UI. 
+Utility function convert_to_safetensors.py taken from [here](https://github.com/harrywang/finetune-sd/blob/main/convert-to-safetensors.py).
 4. **model**: Contains training script adapted from [Diffusers](https://github.com/huggingface/diffusers/blob/main/examples/text_to_image/train_text_to_image_lora.py).

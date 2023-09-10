@@ -1,3 +1,8 @@
+"""
+To generate eval metrics, we run inference on our model to generate a test set.
+This code generates the images, then converts these images to audio for FAD and IS evaluation
+"""
+
 import json
 import os
 import sys
@@ -92,8 +97,8 @@ for chkpt in checkpoints:
     # Construct the image output path
     image_output_path = os.path.join("data/test", folder_name)
 
-    # Uncomment the below line if you want to generate test set
-    # generate_test_set(chkpt, "test_captions.json", image_output_path)
+    # Generate test set
+    generate_test_set(chkpt, "test_captions.json", image_output_path)
 
     # Construct the audio output path
     audio_output_path = os.path.join(image_output_path, "wav")

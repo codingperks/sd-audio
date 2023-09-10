@@ -3,7 +3,7 @@ exclude = '''
 (
       model/sd_ex/lora/out
     | .*\.ipynb
-    | evaluation/audio_ldm_eval-main/*
+    | evaluation/audio_ldm_eval-main
 )
 '''
 

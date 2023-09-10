@@ -61,10 +61,6 @@ def generate_test_set(model, prompts, output_folder):
         print(f"{youtube_id}.png saved!")
 
 
-def convert_test_to_audio(image_dir, output_dir):
-    """
-    Function used to convert .png inference outputs to .wav
-    """
 # Updated function
 def convert_test_to_audio(image_dir, output_dir):
     # Create processor
@@ -113,9 +109,6 @@ for chkpt in checkpoints:
 
     # Generate test set
     generate_test_set(chkpt, "test_captions.json", image_output_path)
-    
-    # Uncomment the below line if you want to generate test set
-    # generate_test_set(chkpt, "test_captions.json", image_output_path)
 
     # Construct the audio output path
     audio_output_path = os.path.join(image_output_path, "wav")

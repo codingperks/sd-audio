@@ -1,9 +1,9 @@
 [tool.black]
 exclude = '''
 (
-      /model/sd_ex/lora/out
+      model/sd_ex/lora/out
     | .*\.ipynb
-    | audio_ldm_eval-main/*
+    | evaluation/audio_ldm_eval-main/*
 )
 '''
 

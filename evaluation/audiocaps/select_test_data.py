@@ -5,7 +5,7 @@ import shutil
 def copy_files():
     src = "/vol/bitbucket/rp22/sdspeech/data/audiocaps/dataset_full/test"
 
-    dest = "/vol/bitbucket/rp22/sdspeech/evaluation/audiocaps/data/test"
+    dest = "/vol/bitbucket/rp22/sdspeech/evaluation/audiocaps/data/test/ground_truth"
 
     # Make sure the destination directory exists; create it if it doesn't
     if not os.path.exists(dest):

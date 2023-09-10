@@ -7,6 +7,8 @@ import soundfile as sf
 
 from data.utils.spectrogram_image_converter import SpectrogramImageConverter
 
+from PIL import Image
+
 
 class WavPreprocessor:
     """
@@ -111,10 +113,10 @@ class WavPreprocessor:
 
     def spec_to_wav(self, spec_path):
         # Convert path to image
-        # if spec_path is not isinstance(spec_path, Image.Image):
-        #    spec_path = Image.open(spec_path)
+        if spec_path is not isinstance(spec_path, Image.Image):
+            spec_path = Image.open(spec_path)
 
-        # Convert segment to image
+        # Convert image to segment
         segment = self._converter.audio_from_spectrogram_image(image=spec_path)
 
         return segment
@@ -124,7 +126,7 @@ class WavPreprocessor:
         # if spec_path is not isinstance(spec_path, Image.Image):
         #    spec_path = Image.open(spec_path)
 
-        # Convert segment to image
+        # Convert image to segment
         segment = self._converter.audio_from_spectrogram_image(image=spec_path)
         segment = segment.get_array_of_samples()
         segment = np.array(segment)

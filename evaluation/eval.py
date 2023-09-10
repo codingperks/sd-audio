@@ -1,7 +1,7 @@
 import json
 
 import torch
-from audioldm_eval.audioldm_eval import EvaluationHelper
+from audioldm_eval.audioldm_eval.eval import EvaluationHelper
 
 
 def evaluate(gen_dir, test_dir, results_name):
@@ -25,3 +25,5 @@ def evaluate(gen_dir, test_dir, results_name):
 
     with open(results_name, "w") as outfile:
         json.dump(metrics, outfile)
+
+evaluate("audiocaps/data/test/5e4", "audiocaps/data/test/ground_truth", "audiocaps/results/5e4")

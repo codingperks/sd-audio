@@ -1,4 +1,4 @@
-# Fine tuning Stable Diffusion for Audio Spectrograms
+# Stable Diffusion for Audio Spectrograms
 ## Dissertation project for MSc. Computing at Imperial College London
 
 ### Author: Ryan Perkins

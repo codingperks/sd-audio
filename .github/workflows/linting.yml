@@ -22,7 +22,7 @@ jobs:
 
       - name: Check imports using isort
         run: |
-          isort . --check --profile black
+          isort . --check --profile black --skip evaluation/audioldm_eval-main
 
       - name: Linting and Formatting
         run: |

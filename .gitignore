@@ -22,9 +22,6 @@ checkpoint-*
 *.ckpt
 model/sd_ex/lora/out/**/config.json
 
-# existing repos
-audio_ldm_eval-main/*
-
 # archive folders
 archive/
 

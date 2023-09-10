@@ -4,10 +4,9 @@ import librosa
 import numpy as np
 import pydub
 import soundfile as sf
+from PIL import Image
 
 from data.utils.spectrogram_image_converter import SpectrogramImageConverter
-
-from PIL import Image
 
 
 class WavPreprocessor:

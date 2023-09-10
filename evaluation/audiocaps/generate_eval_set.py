@@ -1,12 +1,11 @@
 import json
 import os
 import sys
-from PIL import Image
 
 import torch
 from diffusers import StableDiffusionPipeline
 
-# Append the parent directory to sys.path
+# Append parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from data.utils.spectrogram_params import SpectrogramParams
@@ -49,6 +48,7 @@ def generate_test_set(model, prompts, output_folder):
         image.save(os.path.join(output_folder, f"{youtube_id}.png"))
         print(f"{youtube_id}.png saved!")
 
+
 # Updated function
 def convert_test_to_audio(image_dir, output_dir):
     # Create processor
@@ -61,9 +61,10 @@ def convert_test_to_audio(image_dir, output_dir):
         num_frequencies=512,
     )
     processor = WavPreprocessor(spectrogram_params=params)
-    
+
     # Process entire directory of images to wav
     processor.spec_to_wav_folder(image_dir, output_dir)
+
 
 def resample_audio(audio_dir):
     # Create processor
@@ -76,26 +77,29 @@ def resample_audio(audio_dir):
         num_frequencies=512,
     )
     processor = WavPreprocessor(spectrogram_params=params)
-    
+
     processor.resample_folder(audio_dir, 16000)
 
-""" checkpoints = ["/vol/bitbucket/rp22/sdspeech/evaluation/model-checkpoints/7e4-75epochs-full/7e4-checkpoint-852142-final",
-               "/vol/bitbucket/rp22/sdspeech/evaluation/model-checkpoints/5e4-75epochs-full/5e4-checkpoint-852142-final"]
+
+checkpoints = [
+    "/vol/bitbucket/rp22/sdspeech/evaluation/model-checkpoints/7e4-75epochs-full/7e4-checkpoint-852142-final",
+    "/vol/bitbucket/rp22/sdspeech/evaluation/model-checkpoints/5e4-75epochs-full/5e4-checkpoint-852142-final",
+]
 for chkpt in checkpoints:
     # Extract the desired folder name
-    folder_name = chkpt.split('/')[-2].split('-')[0]
-    
+    folder_name = chkpt.split("/")[-2].split("-")[0]
+
     # Construct the image output path
     image_output_path = os.path.join("data/test", folder_name)
-    
+
     # Uncomment the below line if you want to generate test set
     # generate_test_set(chkpt, "test_captions.json", image_output_path)
-    
+
     # Construct the audio output path
     audio_output_path = os.path.join(image_output_path, "wav")
 
     # Convert generated images to .wav
-    convert_test_to_audio(image_output_path, audio_output_path) """
+    convert_test_to_audio(image_output_path, audio_output_path)
 
 wavs = ["data/test/5e4/wav", "data/test/7e4/wav"]
 

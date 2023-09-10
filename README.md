@@ -1,11 +1,9 @@
 # Fine tuning SD for Audio Spectrograms
 ## Dissertation project for MSc. Computing
 
----
 ### Author: Ryan Perkins
 #### Supervisors: Björn Schuller, Rodrigo Mira
 
----
 **Abstract**: Stable Diffusion (SD) is a popular open-source model pre-trained on billions of image-text pairs, designed to generate images from textual prompts. With its extensive ecosystem and supportive community, SD offers functionalities like inpainting and outpainting along with a multitude of other features enabling enhanced control over generation. Notably, SD can be fine-tuned on consumer-level hardware, enabling users to adapt the model to their specific needs.
 
 While diffusion models have been foundational in text-to-audio (TTA) systems, training them from scratch remains prohibitively expensive for many consumers. Moreover, these models may lack the functionality, support and tools that the SD ecosystem provides.

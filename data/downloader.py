@@ -7,7 +7,7 @@ import pandas as pd
 
 def download_audiocaps(index_csv, success_csv, failures_csv, output_dir, limit):
     """
-    Function which takes in an audiocaps index csv for train/test/val and attempts to download these clips from YouTube.
+    Function which takes in an audiocaps index csv for train/test/val and attempts to download AC/AS clips from YouTube.
     Generates a success file and a failure file denoting (un)successfully scraped audio clips.
 
     Args:
@@ -104,3 +104,12 @@ def download_audiocaps(index_csv, success_csv, failures_csv, output_dir, limit):
             n_downloaded += 1
             if n_downloaded >= target:
                 break
+
+
+download_audiocaps(
+    "dataset/train.csv",
+    "dataset_full/train_download_success.csv",
+    "dataset_full/train_download_fail.csv",
+    "dataset_full/train",
+    1,
+)

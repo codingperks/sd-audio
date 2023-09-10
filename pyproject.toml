@@ -2,7 +2,8 @@
 exclude = '''
 (
       /model/sd_ex/lora/out
-    | \.ipynb
+    | /.ipynb
+    | audio_ldm_eval-main/*
 )
 '''
 

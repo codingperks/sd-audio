@@ -1,3 +1,9 @@
+"""
+This main file creates a WavPreprocessor object for converting between image and audio during data preparation and training.
+This file then parses command line arguments to configure our training runs.
+This file is ran using train.sh in order to appropriately set environment variables (to avoid overfilling temporary folders).
+"""
+
 import argparse
 import shutil
 from datetime import date
@@ -25,7 +31,7 @@ if __name__ == "__main__":
     # pipeline = ACPipeline("./data/audiocaps/dataset_full", processor)
     # pipeline.create_dataset(44100)
 
-    # Parse JSON parameters
+    # Parse JSON parameters from config file
     config = parse_json("config/json/config.json")
 
     # Argparse setup

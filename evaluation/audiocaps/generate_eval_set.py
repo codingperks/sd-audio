@@ -1,3 +1,8 @@
+"""
+To generate eval metrics, we run inference on our model to generate a test set.
+This code generates the images, then converts these images to audio for FAD and IS evaluation
+"""
+
 import json
 import os
 import sys
@@ -13,6 +18,13 @@ from data.wav_preprocessor import WavPreprocessor
 
 
 def generate_test_set(model, prompts, output_folder):
+    """
+    Use a pre-trained model to create tests set through inference
+    Args:
+        Model: Path to model weight directory (created by our training script)
+        Prompts: JSON of test data (containing captions) for inference
+        Output_folder: Location to output .png test data
+    """
     device = "cuda"
 
     # load model and weights
@@ -28,7 +40,7 @@ def generate_test_set(model, prompts, output_folder):
 
     pipe.unet.load_attn_procs(model_path, weight_name="pytorch_model.bin")
 
-    # prepare output folder
+    # Prepare output folder
     os.makedirs(output_folder, exist_ok=True)
 
     pipe.to(device)
@@ -67,6 +79,9 @@ def convert_test_to_audio(image_dir, output_dir):
 
 
 def resample_audio(audio_dir):
+    """
+    Resample audio for evaluation code (which only works with 16kHz and 32kHz audio)
+    """
     # Create processor
     params = SpectrogramParams(
         sample_rate=44100,
@@ -92,8 +107,8 @@ for chkpt in checkpoints:
     # Construct the image output path
     image_output_path = os.path.join("data/test", folder_name)
 
-    # Uncomment the below line if you want to generate test set
-    # generate_test_set(chkpt, "test_captions.json", image_output_path)
+    # Generate test set
+    generate_test_set(chkpt, "test_captions.json", image_output_path)
 
     # Construct the audio output path
     audio_output_path = os.path.join(image_output_path, "wav")

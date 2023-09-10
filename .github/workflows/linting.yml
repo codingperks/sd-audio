@@ -31,6 +31,6 @@ jobs:
           # Check for style guide compliance
           flake8 . --count --max-line-length=88 --statistics
           # Check formatting using black
-          black --check .
+          black --check . --skip evaluation/audioldm_eval-main
 
     

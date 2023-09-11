@@ -1,4 +1,4 @@
-# Stable Diffusion for Audio Spectrograms
+# Bootstrapping Stable Diffusion for Audio Synthesis
 ## Dissertation project for MSc. Computing at Imperial College London
 
 ### Author: Ryan Perkins
